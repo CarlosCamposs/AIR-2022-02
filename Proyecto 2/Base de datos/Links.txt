@@ -17,6 +17,16 @@ Producto Interno Bruto  (a precios de mercado)
 Tasa de desocupación (POBLACION TOTAL)
 https://www.inegi.org.mx/app/buscador/default.html?q=444666 
 
+Indicador Trimestral del Ahorro Bruto ITAB
+https://www.inegi.org.mx/programas/itab/2013/#Datos_abiertos
+
+Índice de Precios y Cotizaciones
+https://www.banxico.org.mx/SieInternet/consultarDirectorioInternetAction.do?sector=7&accion=consultarCuadro&idCuadro=CF57&locale=es
+
+TIIE
+https://www.banxico.org.mx/SieInternet/consultarDirectorioInternetAction.do?sector=18&accion=consultarCuadro&idCuadro=CF111&locale=es
+
+
 ## /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Otros enlaces:
 

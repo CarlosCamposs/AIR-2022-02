@@ -138,7 +138,7 @@ SELECT * FROM pib;
 
 
 -- //////////////////////////////////////////////////////////////////// 
--- //// TASA DE DESOCUPACION (PD)
+-- //// TASA DE DESOCUPACION (TD)
 
 -- Creamos el esqueleto de la tabla
 CREATE TABLE tabla_td(
@@ -167,15 +167,48 @@ SELECT fecha, td FROM view_td;
 
 SELECT * FROM td;
 
+--//////////////////////////////////////////////////////////////////// 
+-- //// INDICE DE PRECIOS Y COTIZACIONES
+
+-- Creamos el esqueleto de la tabla
+CREATE TABLE tabla_ipc(
+	fecha varchar PRIMARY KEY,
+	ipc varchar);
+
+-- Importamos los datos del ipc en la tabla
+SELECT * FROM tabla_ipc;
+
+-- Creamos una view segregando año y mes de cada registro
+CREATE VIEW view_ipc
+AS
+SELECT *, 
+	SUBSTRING(fecha FROM 4 FOR 2)AS month,
+	SUBSTRING(fecha FROM 7 FOR 4)AS year
+FROM tabla_ipc;
+
+-- Visualizamos la view creada
+SELECT * FROM view_ipc;
+
+-- Eliminamos los registros que no son de nuestro interes
+DELETE FROM view_ipc WHERE  year<'2000' OR year>'2021';
+DELETE FROM view_ipc WHERE month<'12' and year='2000';
+
+-- Finalmente creamos la tabla con los datos de inflacion
+CREATE TABLE ipc AS
+SELECT fecha, ipc FROM view_ipc;
+
+SELECT * FROM ipc;
+
+
 -- //////////////////////////////////////////////////////////////////// 
 -- UNION DE TABLAS
 
-SELECT * FROM cetes
-SELECT * FROM inflacion
-SELECT * FROM pib
-SELECT * FROM tc
-SELECT * FROM td
-
+SELECT * FROM cetes;
+SELECT * FROM inflacion;
+SELECT * FROM pib;
+SELECT * FROM tc;
+SELECT * FROM td;
+SELECT * FROM ipc;
 
 -- Guardamos en una VIEW las tablas que hemos creado, usando como "columna join" la fecha
 CREATE VIEW view_database AS
@@ -185,7 +218,8 @@ A.tasa_cetes,
 B.inpc,
 C.pib,
 D.tc,
-E.td
+E.td,
+F.ipc
 FROM cetes AS A
 LEFT JOIN inflacion AS B
 ON A.fecha=B.fecha
@@ -195,6 +229,8 @@ LEFT JOIN tc AS D
 ON A.fecha=D.fecha
 LEFT JOIN td AS E
 ON A.fecha=E.fecha
+LEFT JOIN ipc AS F
+ON A.fecha=F.fecha;
 
 -- Visualizamos la view creada
 SELECT * FROM view_database;
@@ -202,25 +238,21 @@ SELECT * FROM view_database;
 -- Corregimos un error que hemos venido arrastrando desde antes, las variables macroeconómicas ahora
 -- las cambiamos a variable tipo "numeric", en lugar de tipo "char"
 
-CREATE TABLE data_base AS
+CREATE TABLE database AS
 SELECT 
-fecha,
-cast(tasa_cetes as numeric)/100 AS tasa_cetes, --4 DECIMALES
-cast(inpc as numeric)/100 AS inflacion, --4 DECIMALES
-cast(pib as numeric)/100 AS pib, --5 DECIMALES
-ln(cast(tc as numeric)) AS ln_tc, -- 5 DECIMALES
-cast(td as numeric)/100 AS td --5 DECIMALES
-FROM view_database;
-
--- Visualizamos la tabla final
-SELECT * FROM data_base;
-
-
-SELECT 
-fecha,
+SUBSTRING(fecha FROM 4 FOR 7) AS fecha,
 ROUND(cast(tasa_cetes as numeric)/100,4) AS tasa_cetes,
 ROUND(cast(inpc as numeric)/100,4) AS inflacion,
 ROUND(cast(pib as numeric)/100,5) AS pib,
 ROUND(ln(cast(tc as numeric)),5) AS ln_tc,
-ROUND(cast(td as numeric)/100,5) AS td
+ROUND(cast(td as numeric)/100,5) AS td,
+ROUND(ln(cast(ipc as numeric)),5) AS ln_ipc
 FROM view_database;
+
+
+-- Visualizamos la tabla final
+SELECT * FROM database;
+
+
+
+
