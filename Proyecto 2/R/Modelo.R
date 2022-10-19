@@ -69,7 +69,8 @@ pd_tbm <- read_excel("Proyecto 2 Stress Testing (E9).xlsx", sheet = "TBM")
 
 # Tomamos solo las observaciones correspondientes a 2005 en adelante
 pd_tbm<-pd_tbm[50:nrow(database),]
-pd_santdr<-pd_santdr[50:nrow(database),]
+
+#pd_santdr<-pd_santdr[50:nrow(database),]
 
 
 
@@ -131,6 +132,9 @@ summary(modelo3)
 
 #####################
 ### Santander (Empresas)
+pd_santdr <- read_excel("Proyecto 2 Stress Testing (E9).xlsx", sheet = "Santander")
+pd_santdr<-pd_santdr[50:nrow(database),]
+
 
 santdr_empresas<-pd_santdr$Empresas
 
@@ -148,17 +152,33 @@ summary(modelo4)
 ### Santander (Consumo)
 
 santdr_consumo<-pd_santdr$Consumo
-  # Existen valores NA, Inf
+  # Existen valores NA y 1
+
+# Los valores de "1" los cambiamos por NA
+santdr_consumo[which(santdr_consumo==1)] <- NA
+santdr_consumo
+
 
 score_consumoSANTDR<-vector()
 for (i in 1:nrow(datos)){
   score_consumoSANTDR[i]<-log(santdr_consumo[i]/(1-santdr_consumo[i]))
 }
-
-
-#Error
 modelo5<-lm(score_consumoSANTDR~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc,data=datos)
 summary(modelo5)
+# Elimina 40 observaciones
+
+
+
+# Otra alternativa para esos datos 
+# Por si quisieramos convertirlos a 1
+santdr_consumo[!is.finite(santdr_consumo)] <- 1
+santdr_consumo
+
+
+# Los valores Inf les asignamos valor NA
+score_consumoSANTDR[!is.finite(score_consumoSANTDR)] <- NA
+score_consumoSANTDR
+
 
 #####################
 ### Santander (Vivienda)
@@ -176,8 +196,11 @@ summary(modelo6)
 
 
 
-
-pd_santdr <- read_excel("Proyecto 2 Stress Testing (E9).xlsx", sheet = "Santander")
+summary(modelo1)
+summary(modelo2)
+summary(modelo3)
+summary(modelo4)
+summary(modelo6)
 
 
 
