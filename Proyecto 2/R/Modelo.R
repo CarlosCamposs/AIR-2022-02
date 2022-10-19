@@ -77,15 +77,42 @@ pairs(datos)
 pd_tbm <- read_excel("Proyecto 2 Stress Testing (E9).xlsx", sheet = "TBM")
 pd_santdr <- read_excel("Proyecto 2 Stress Testing (E9).xlsx", sheet = "Santander")
 
+
 class(pd_tbm)
 class(pd_santdr)
 
+# Tomamos solo las observaciones correspondientes a 2005 en adelante
+pd_tbm<-pd_tbm[50:nrow(database),]
+pd_santdr<-pd_santdr[50:nrow(database),]
+datos<-database[50:nrow(database),-c(1)]        
+datos$td<-as.numeric(datos$td)
 
 
+tbm_empresas<-pd_tbm$Empresas
+tbm_empresas[1]
 
 
+score<-vector()
 
+for (i in 1:nrow(datos)){
+  score[i]<-log(tbm_empresas[i]/(1-tbm_empresas[i]))
+}
 
+score[1]
 
+attach(datos)
+modelo1<-lm(score~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc,data=datos)
+modelo1
+anova(modelo1)
+b0<-summary(modelo1)$coefficients[1]
+b1<-summary(modelo1)$coefficients[2]
+b2<-summary(modelo1)$coefficients[3]
+b3<-summary(modelo1)$coefficients[4]
+b4<-summary(modelo1)$coefficients[5]
+b5<-summary(modelo1)$coefficients[6]
+b6<-summary(modelo1)$coefficients[7]
+
+b0+b1*tasa_cetes+b2*inflacion+b3*pib+b4*ln_tc+b5*td+b6*ln_ipc
+score
 # ////////////////////////////////////////////////////////////////////
 # SEGUNDO MODELO (sin TD)
