@@ -200,6 +200,7 @@ summary(modelo1)
 summary(modelo2)
 summary(modelo3)
 summary(modelo4)
+summary(modelo5)
 summary(modelo6)
 
 
