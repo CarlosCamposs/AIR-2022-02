@@ -37,26 +37,17 @@ database$td[50]
 
 
 # ////////////////////////////////////////////////////////////////////
-# PRIMER MODELO
+# PRIMER MODELO (TBM)
 
 # Restringimos el modelo a partir de 2005, esto se hace para considerar los valores
 # de la TD  
 datos<-database[50:nrow(database),-c(1)]        
-class(datos)        
-
 
 
 # La columna de td la convertimos en 'numeric', ya que los valores NULL hicieron
 # que R leyera la columna como character
 datos$td<-as.numeric(datos$td)
 datos
-
-class(datos$tasa_cetes)
-class(datos$inflacion)
-class(datos$pib)
-class(datos$ln_tc)
-class(datos$td)
-class(datos$ln_ipc)
 
 
 # Creamos un gráfico de correlaciones
@@ -65,45 +56,37 @@ corrplot(correlacion, method="number", type="upper")
         
 
 # Otro tipo de gráfico de correlación
-install.packages("PerformanceAnalytics")
-library("PerformanceAnalytics")
-chart.Correlation(datos, histogram=F, pch=19)
+#install.packages("PerformanceAnalytics")
+#library("PerformanceAnalytics")
+#chart.Correlation(datos, histogram=F, pch=19)
 # Otro gráfico
-pairs(datos)
+#pairs(datos)
 
 
 
 # Cargamos los datos de la proxy de PD
 pd_tbm <- read_excel("Proyecto 2 Stress Testing (E9).xlsx", sheet = "TBM")
-pd_santdr <- read_excel("Proyecto 2 Stress Testing (E9).xlsx", sheet = "Santander")
-
-
-class(pd_tbm)
-class(pd_santdr)
 
 # Tomamos solo las observaciones correspondientes a 2005 en adelante
 pd_tbm<-pd_tbm[50:nrow(database),]
 pd_santdr<-pd_santdr[50:nrow(database),]
-datos<-database[50:nrow(database),-c(1)]        
-datos$td<-as.numeric(datos$td)
 
+
+
+#####################
+### TBM (Empresas)
 
 tbm_empresas<-pd_tbm$Empresas
-tbm_empresas[1]
 
-
-score<-vector()
-
+score_empresasTBM<-vector()
 for (i in 1:nrow(datos)){
-  score[i]<-log(tbm_empresas[i]/(1-tbm_empresas[i]))
+  score_empresasTBM[i]<-log(tbm_empresas[i]/(1-tbm_empresas[i]))
 }
 
-score[1]
+modelo1<-lm(score_empresasTBM~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc,data=datos)
+summary(modelo1)
 
-attach(datos)
-modelo1<-lm(score~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc,data=datos)
-modelo1
-anova(modelo1)
+
 b0<-summary(modelo1)$coefficients[1]
 b1<-summary(modelo1)$coefficients[2]
 b2<-summary(modelo1)$coefficients[3]
@@ -112,7 +95,72 @@ b4<-summary(modelo1)$coefficients[5]
 b5<-summary(modelo1)$coefficients[6]
 b6<-summary(modelo1)$coefficients[7]
 
-b0+b1*tasa_cetes+b2*inflacion+b3*pib+b4*ln_tc+b5*td+b6*ln_ipc
-score
+
+fitted_scores<-b0+b1*tasa_cetes+b2*inflacion+b3*pib+b4*ln_tc+b5*td+b6*ln_ipc
+fitted_scores
+
+
+
+#####################
+### TBM (Consumo)
+
+tbm_consumo<-pd_tbm$Consumo
+
+score_consumoTBM<-vector()
+for (i in 1:nrow(datos)){
+  score_consumoTBM[i]<-log(tbm_consumo[i]/(1-tbm_consumo[i]))
+}
+
+modelo2<-lm(score_consumoTBM~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc,data=datos)
+summary(modelo2)
+
+
+
+#####################
+### TBM (Vivienda)
+
+tbm_vivienda<-pd_tbm$Vivienda
+
+score_viviendaTBM<-vector()
+for (i in 1:nrow(datos)){
+  score_viviendaTBM[i]<-log(tbm_vivienda[i]/(1-tbm_vivienda[i]))
+}
+
+modelo3<-lm(score_viviendaTBM~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc,data=datos)
+summary(modelo3)
+
+#####################
+### Santander (Empresas)
+
+santdr_empresas<-pd_santdr$Empresas
+
+score_empresasSANTDR<-vector()
+for (i in 1:nrow(datos)){
+  score_empresasSANTDR[i]<-log(santdr_empresas[i]/(1-santdr_empresas[i]))
+}
+
+modelo4<-lm(score_empresasSANTDR~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc,data=datos)
+summary(modelo4)
+
+#####################
+### Santander (Consumo)
+
+santdr_consumo<-pd_santdr$Consumo
+
+score_consumoSANTDR<-vector()
+for (i in 1:nrow(datos)){
+  score_consumoSANTDR[i]<-log(santdr_consumo[i]/(1-santdr_consumo[i]))
+}
+
+#Error
+modelo5<-lm(score_consumoSANTDR~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc,data=datos)
+summary(modelo5)
+
+
+pd_santdr <- read_excel("Proyecto 2 Stress Testing (E9).xlsx", sheet = "Santander")
+
+
+
+
 # ////////////////////////////////////////////////////////////////////
 # SEGUNDO MODELO (sin TD)
