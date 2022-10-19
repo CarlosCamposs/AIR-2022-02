@@ -67,11 +67,20 @@ corrplot(correlacion, method="number", type="upper")
 # Otro tipo de gráfico de correlación
 install.packages("PerformanceAnalytics")
 library("PerformanceAnalytics")
-
 chart.Correlation(datos, histogram=F, pch=19)
-
 # Otro gráfico
 pairs(datos)
+
+
+
+# Cargamos los datos de la proxy de PD
+pd_tbm <- read_excel("Proyecto 2 Stress Testing (E9).xlsx", sheet = "TBM")
+pd_santdr <- read_excel("Proyecto 2 Stress Testing (E9).xlsx", sheet = "Santander")
+
+class(pd_tbm)
+class(pd_santdr)
+
+
 
 
 
