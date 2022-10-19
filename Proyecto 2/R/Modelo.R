@@ -142,19 +142,39 @@ for (i in 1:nrow(datos)){
 modelo4<-lm(score_empresasSANTDR~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc,data=datos)
 summary(modelo4)
 
+
+
 #####################
 ### Santander (Consumo)
 
 santdr_consumo<-pd_santdr$Consumo
+  # Existen valores NA, Inf
 
 score_consumoSANTDR<-vector()
 for (i in 1:nrow(datos)){
   score_consumoSANTDR[i]<-log(santdr_consumo[i]/(1-santdr_consumo[i]))
 }
 
+
 #Error
 modelo5<-lm(score_consumoSANTDR~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc,data=datos)
 summary(modelo5)
+
+#####################
+### Santander (Vivienda)
+
+santdr_vivienda<-pd_santdr$Vivienda
+
+score_viviendaSANTDR<-vector()
+for (i in 1:nrow(datos)){
+  score_viviendaSANTDR[i]<-log(santdr_vivienda[i]/(1-santdr_vivienda[i]))
+}
+
+modelo6<-lm(score_viviendaSANTDR~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc,data=datos)
+summary(modelo6)
+
+
+
 
 
 pd_santdr <- read_excel("Proyecto 2 Stress Testing (E9).xlsx", sheet = "Santander")
