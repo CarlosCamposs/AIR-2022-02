@@ -26,6 +26,17 @@ https://www.banxico.org.mx/SieInternet/consultarDirectorioInternetAction.do?sect
 TIIE
 https://www.banxico.org.mx/SieInternet/consultarDirectorioInternetAction.do?sector=18&accion=consultarCuadro&idCuadro=CF111&locale=es
 
+UDI
+https://www.banxico.org.mx/SieInternet/consultarDirectorioInternetAction.do?sector=8&accion=consultarCuadro&idCuadro=CP150&locale=es
+
+Total de la Actividad Industrial (Indicador económico de coyuntura--> Actividad industrial)
+https://www.inegi.org.mx/app/indicadores/?tm=0&t=10200103#bodydataExplorer
+		(https://www.inegi.org.mx/app/indicadores/?tm=0&t=10200103#D10200103)
+
+Indice Nacional de Precios Productor
+https://www.inegi.org.mx/app/indicadores/?tm=0&t=10200103#bodydataExplorer
+https://www.inegi.org.mx/app/indicadores/?tm=0&t=10200103#bodydataExplorer#D10200103
+
 
 ## /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Otros enlaces:

@@ -199,6 +199,71 @@ SELECT fecha, ipc FROM view_ipc;
 
 SELECT * FROM ipc;
 
+-- //////////////////////////////////////////////////////////////////// 
+-- //// Actividad Industrial
+
+-- Creamos el esqueleto de la tabla
+CREATE TABLE tabla_actvind(
+	Fecha varchar PRIMARY KEY,
+	actv_industrial varchar);
+
+-- Importamos los datos de la actividad industrial en la tabla
+SELECT * FROM tabla_actvind;
+
+-- Creamos una view segregando año y mes de cada registro
+CREATE VIEW view_actvind
+AS
+SELECT *, 
+	SUBSTRING(fecha FROM 4 FOR 2)AS month,
+	SUBSTRING(fecha FROM 7 FOR 4)AS year
+FROM tabla_actvind;
+
+-- Visualizamos la view creada
+SELECT * FROM view_actvind;
+
+-- Eliminamos los registros que no son de nuestro interes
+DELETE FROM view_actvind WHERE  year<'2000' OR year>'2021';
+DELETE FROM view_actvind WHERE month<'12' and year='2000'
+
+-- Finalmente creamos la tabla con los datos de la actividad industrial
+CREATE TABLE actvind AS
+SELECT fecha, actv_industrial FROM view_actvind;
+
+SELECT * FROM actvind;
+
+-- //////////////////////////////////////////////////////////////////// 
+-- //// INPP
+
+-- Creamos el esqueleto de la tabla
+CREATE TABLE tabla_inpp(
+	Fecha varchar PRIMARY KEY,
+	inpp varchar);
+
+-- Importamos los datos del inpp en la tabla
+SELECT * FROM tabla_inpp;
+
+-- Creamos una view segregando año y mes de cada registro
+CREATE VIEW view_inpp
+AS
+SELECT *, 
+	SUBSTRING(fecha FROM 4 FOR 2)AS month,
+	SUBSTRING(fecha FROM 7 FOR 4)AS year
+FROM tabla_inpp;
+
+-- Visualizamos la view creada
+SELECT * FROM view_inpp;
+
+-- Eliminamos los registros que no son de nuestro interes
+DELETE FROM view_inpp WHERE  year<'2000' OR year>'2021';
+DELETE FROM view_inpp WHERE month<'12' and year='2000'
+
+-- Finalmente creamos la tabla con los datos de inflacion
+CREATE TABLE inpp AS
+SELECT fecha, inpp FROM view_inpp;
+
+SELECT * FROM inpp;
+
+
 
 -- //////////////////////////////////////////////////////////////////// 
 -- UNION DE TABLAS
@@ -209,6 +274,8 @@ SELECT * FROM pib;
 SELECT * FROM tc;
 SELECT * FROM td;
 SELECT * FROM ipc;
+SELECT * FROM actvind;
+SELECT* FROM inpp;
 
 -- Guardamos en una VIEW las tablas que hemos creado, usando como "columna join" la fecha
 CREATE VIEW view_database AS
@@ -219,7 +286,9 @@ B.inpc,
 C.pib,
 D.tc,
 E.td,
-F.ipc
+F.ipc,
+G.actv_industrial,
+H.inpp
 FROM cetes AS A
 LEFT JOIN inflacion AS B
 ON A.fecha=B.fecha
@@ -230,7 +299,11 @@ ON A.fecha=D.fecha
 LEFT JOIN td AS E
 ON A.fecha=E.fecha
 LEFT JOIN ipc AS F
-ON A.fecha=F.fecha;
+ON A.fecha=F.fecha
+LEFT JOIN actvind AS G
+ON A.fecha=G.fecha
+LEFT JOIN inpp AS H
+ON A.fecha=H.fecha;
 
 -- Visualizamos la view creada
 SELECT * FROM view_database;
@@ -246,7 +319,9 @@ ROUND(cast(inpc as numeric)/100,4) AS inflacion,
 ROUND(cast(pib as numeric)/100,5) AS pib,
 ROUND(ln(cast(tc as numeric)),5) AS ln_tc,
 ROUND(cast(td as numeric)/100,5) AS td,
-ROUND(ln(cast(ipc as numeric)),5) AS ln_ipc
+ROUND(ln(cast(ipc as numeric)),5) AS ln_ipc,
+ROUND(ln(cast(actv_industrial as numeric)),5) AS ln_actvindustrial,
+ROUND(ln(cast(inpp as numeric)),5) AS ln_inpp
 FROM view_database;
 
 
