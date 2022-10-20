@@ -32,8 +32,13 @@ library(corrplot)
 setwd("C:/Users/Carlos Campos/Desktop/GitHub/AIR-2022-02/Proyecto 2/R")
 database<-read.csv("database.csv",header=TRUE)
 
+
 # A partir de la fila 50 empiezan los registros de TD
 database$td[50]
+
+# https://towardsdatascience.com/selecting-the-best-predictors-for-linear-regression-in-r-f385bf3d93e9
+
+
 
 
 # ////////////////////////////////////////////////////////////////////
@@ -41,15 +46,22 @@ database$td[50]
 
 # Restringimos el modelo a partir de 2005, esto se hace para considerar los valores
 # de la TD  
-datos<-database[50:nrow(database),-c(1)]        
+datos<-database[,-c(1)]        
 
+datos<-database[50:nrow(database),-c(1)]        
+attach(datos)
+
+ln_actvindustrial[181] # Tiene valor NULL
 
 # La columna de td la convertimos en 'numeric', ya que los valores NULL hicieron
 # que R leyera la columna como character
 datos$td<-as.numeric(datos$td)
-datos
+datos$ln_actvindustrial<-as.numeric(datos$ln_actvindustrial)
+datos$ln_inpp<-as.numeric(datos$ln_inpp)
+datos$td<-as.numeric(datos$td)
 
 
+class(datos$ln_inpp)
 # Creamos un gráfico de correlaciones
 correlacion<-round(cor(datos), 2)
 corrplot(correlacion, method="number", type="upper")  
@@ -57,8 +69,8 @@ corrplot(correlacion, method="number", type="upper")
 
 # Otro tipo de gráfico de correlación
 #install.packages("PerformanceAnalytics")
-#library("PerformanceAnalytics")
-#chart.Correlation(datos, histogram=F, pch=19)
+library("PerformanceAnalytics")
+chart.Correlation(datos, histogram=F, pch=19)
 # Otro gráfico
 #pairs(datos)
 
@@ -67,10 +79,9 @@ corrplot(correlacion, method="number", type="upper")
 # Cargamos los datos de la proxy de PD
 pd_tbm <- read_excel("Proyecto 2 Stress Testing (E9).xlsx", sheet = "TBM")
 
+
 # Tomamos solo las observaciones correspondientes a 2005 en adelante
 pd_tbm<-pd_tbm[50:nrow(database),]
-
-#pd_santdr<-pd_santdr[50:nrow(database),]
 
 
 
@@ -80,12 +91,23 @@ pd_tbm<-pd_tbm[50:nrow(database),]
 tbm_empresas<-pd_tbm$Empresas
 
 score_empresasTBM<-vector()
-for (i in 1:nrow(datos)){
-  score_empresasTBM[i]<-log(tbm_empresas[i]/(1-tbm_empresas[i]))
-}
+score_empresasTBM<-log(tbm_empresas/(1-tbm_empresas))
 
-modelo1<-lm(score_empresasTBM~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc,data=datos)
+modelo1<-lm(score_empresasTBM~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc+ln_actvindustrial+ln_inpp,data=datos)
 summary(modelo1)
+
+#////////////////////////////////////
+attach(datos)
+prueba1<-lm(score_empresasTBM~., data=datos)
+step(prueba1,direction="both",trace=0)
+
+# Modelo propuesto
+prueba1_mod<-lm(score_empresasTBM~tasa_cetes+pib+td+ln_ipc+ln_actvindustrial+ln_inpp, data=datos)
+summary(prueba1_mod)
+#////////////////////////////////////
+
+
+
 
 
 b0<-summary(modelo1)$coefficients[1]
@@ -99,7 +121,7 @@ b6<-summary(modelo1)$coefficients[7]
 
 fitted_scores<-b0+b1*tasa_cetes+b2*inflacion+b3*pib+b4*ln_tc+b5*td+b6*ln_ipc
 fitted_scores
-
+# Existe un comando para encontrar los fitted values
 
 
 #####################
@@ -108,12 +130,21 @@ fitted_scores
 tbm_consumo<-pd_tbm$Consumo
 
 score_consumoTBM<-vector()
-for (i in 1:nrow(datos)){
-  score_consumoTBM[i]<-log(tbm_consumo[i]/(1-tbm_consumo[i]))
-}
+score_consumoTBM<-log(tbm_consumo/(1-tbm_consumo))
 
-modelo2<-lm(score_consumoTBM~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc,data=datos)
+
+modelo2<-lm(score_consumoTBM~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc+ln_actvindustrial+ln_inpp,data=datos)
 summary(modelo2)
+
+#////////////////////////////////////
+prueba2<-lm(score_consumoTBM~., data=datos)
+step(prueba2,direction="both",trace=0)
+
+# El mejor modelo:
+prueba2_mod<-lm(score_consumoTBM~inflacion+pib+ln_tc+td+ln_ipc+ln_actvindustrial+ln_inpp, data=datos)
+summary(prueba2_mod)
+#////////////////////////////////////
+
 
 
 
@@ -123,12 +154,22 @@ summary(modelo2)
 tbm_vivienda<-pd_tbm$Vivienda
 
 score_viviendaTBM<-vector()
-for (i in 1:nrow(datos)){
-  score_viviendaTBM[i]<-log(tbm_vivienda[i]/(1-tbm_vivienda[i]))
-}
+score_viviendaTBM<-log(tbm_vivienda/(1-tbm_vivienda))
 
-modelo3<-lm(score_viviendaTBM~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc,data=datos)
+modelo3<-lm(score_viviendaTBM~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc+ln_actvindustrial+ln_inpp,data=datos)
 summary(modelo3)
+
+#////////////////////////////////////
+attach(datos)
+prueba3<-lm(score_viviendaTBM~., data=datos)
+step(prueba3,direction="both",trace=0)
+
+# Modelo propuesto
+prueba3_mod<-lm(score_viviendaTBM~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc+ln_inpp, data=datos)
+summary(prueba3_mod)
+#////////////////////////////////////
+
+
 
 #####################
 ### Santander (Empresas)
@@ -139,12 +180,21 @@ pd_santdr<-pd_santdr[50:nrow(database),]
 santdr_empresas<-pd_santdr$Empresas
 
 score_empresasSANTDR<-vector()
-for (i in 1:nrow(datos)){
-  score_empresasSANTDR[i]<-log(santdr_empresas[i]/(1-santdr_empresas[i]))
-}
+score_empresasSANTDR<-log(santdr_empresas/(1-santdr_empresas))
 
-modelo4<-lm(score_empresasSANTDR~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc,data=datos)
+modelo4<-lm(score_empresasSANTDR~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc+ln_actvindustrial+ln_inpp,data=datos)
 summary(modelo4)
+
+
+# ////////////////////////////////////
+attach(datos)
+prueba4<-lm(score_empresasSANTDR~., data=datos)
+step(prueba4,direction="both",trace=0)
+
+# Modelo propuesto
+prueba4_mod<-lm(score_empresasSANTDR~tasa_cetes+inflacion+ln_tc+td+ln_ipc+ln_actvindustrial+ln_inpp, data=datos)
+summary(prueba4_mod)
+# ////////////////////////////////////
 
 
 
@@ -152,32 +202,26 @@ summary(modelo4)
 ### Santander (Consumo)
 
 santdr_consumo<-pd_santdr$Consumo
-  # Existen valores NA y 1
-
-# Los valores de "1" los cambiamos por NA
-santdr_consumo[which(santdr_consumo==1)] <- NA
-santdr_consumo
+  
 
 
 score_consumoSANTDR<-vector()
-for (i in 1:nrow(datos)){
-  score_consumoSANTDR[i]<-log(santdr_consumo[i]/(1-santdr_consumo[i]))
-}
-modelo5<-lm(score_consumoSANTDR~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc,data=datos)
+score_consumoSANTDR<-log(santdr_consumo/(1-santdr_consumo))
+
+modelo5<-lm(score_consumoSANTDR~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc+ln_actvindustrial+ln_inpp,data=datos)
 summary(modelo5)
-# Elimina 40 observaciones
+
+#////////////////////////////////////
+attach(datos)
+prueba5<-lm(score_consumoSANTDR~., data=datos)
+step(prueba5,direction="both",trace=0)
+
+# Modelo propuesto
+prueba5_mod<-lm(score_consumoSANTDR~tasa_cetes+inflacion+td+ln_ipc+ln_actvindustrial, data=datos)
+summary(prueba5_mod)
+#////////////////////////////////////
 
 
-
-# Otra alternativa para esos datos 
-# Por si quisieramos convertirlos a 1
-santdr_consumo[!is.finite(santdr_consumo)] <- 1
-santdr_consumo
-
-
-# Los valores Inf les asignamos valor NA
-score_consumoSANTDR[!is.finite(score_consumoSANTDR)] <- NA
-score_consumoSANTDR
 
 
 #####################
@@ -186,12 +230,21 @@ score_consumoSANTDR
 santdr_vivienda<-pd_santdr$Vivienda
 
 score_viviendaSANTDR<-vector()
-for (i in 1:nrow(datos)){
-  score_viviendaSANTDR[i]<-log(santdr_vivienda[i]/(1-santdr_vivienda[i]))
-}
+score_viviendaSANTDR<-log(santdr_vivienda/(1-santdr_vivienda))
 
-modelo6<-lm(score_viviendaSANTDR~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc,data=datos)
+modelo6<-lm(score_viviendaSANTDR~tasa_cetes+inflacion+pib+ln_tc+td+ln_ipc+ln_actvindustrial+ln_inpp,data=datos)
 summary(modelo6)
+
+
+#////////////////////////////////////
+attach(datos)
+prueba6<-lm(score_viviendaSANTDR~., data=datos)
+step(prueba6,direction="both",trace=0)
+
+# Modelo propuesto
+prueba6_mod<-lm(score_viviendaSANTDR~tasa_cetes+inflacion+pib+ln_ipc+ln_actvindustrial+ln_inpp, data=datos)
+summary(prueba6_mod)
+#////////////////////////////////////
 
 
 

@@ -263,6 +263,40 @@ SELECT fecha, inpp FROM view_inpp;
 
 SELECT * FROM inpp;
 
+-- //////////////////////////////////////////////////////////////////// 
+-- //// UDI
+
+-- Creamos el esqueleto de la tabla
+CREATE TABLE tabla_udi(
+	Fecha varchar PRIMARY KEY,
+	udi varchar);
+
+-- Importamos los datos del inpp en la tabla
+SELECT * FROM tabla_udi;
+
+-- Hasta aqui me quedé
+
+-- Creamos una view segregando año y mes de cada registro
+CREATE VIEW view_inpp
+AS
+SELECT *, 
+	SUBSTRING(fecha FROM 4 FOR 2)AS month,
+	SUBSTRING(fecha FROM 7 FOR 4)AS year
+FROM tabla_inpp;
+
+-- Visualizamos la view creada
+SELECT * FROM view_inpp;
+
+-- Eliminamos los registros que no son de nuestro interes
+DELETE FROM view_inpp WHERE  year<'2000' OR year>'2021';
+DELETE FROM view_inpp WHERE month<'12' and year='2000'
+
+-- Finalmente creamos la tabla con los datos de inflacion
+CREATE TABLE inpp AS
+SELECT fecha, inpp FROM view_inpp;
+
+SELECT * FROM inpp;
+
 
 
 -- //////////////////////////////////////////////////////////////////// 
