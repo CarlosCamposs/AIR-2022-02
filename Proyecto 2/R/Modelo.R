@@ -36,7 +36,6 @@ database<-read.csv("database.csv",header=TRUE)
 # A partir de la fila 50 empiezan los registros de TD
 database$td[50]
 
-# https://towardsdatascience.com/selecting-the-best-predictors-for-linear-regression-in-r-f385bf3d93e9
 
 
 
@@ -58,7 +57,6 @@ ln_actvindustrial[181] # Tiene valor NULL
 datos$td<-as.numeric(datos$td)
 datos$ln_actvindustrial<-as.numeric(datos$ln_actvindustrial)
 datos$ln_inpp<-as.numeric(datos$ln_inpp)
-datos$td<-as.numeric(datos$td)
 
 
 class(datos$ln_inpp)
@@ -71,8 +69,6 @@ corrplot(correlacion, method="number", type="upper")
 #install.packages("PerformanceAnalytics")
 library("PerformanceAnalytics")
 chart.Correlation(datos, histogram=F, pch=19)
-# Otro gráfico
-#pairs(datos)
 
 
 
@@ -102,7 +98,7 @@ prueba1<-lm(score_empresasTBM~., data=datos)
 step(prueba1,direction="both",trace=0)
 
 # Modelo propuesto
-prueba1_mod<-lm(score_empresasTBM~tasa_cetes+pib+td+ln_ipc+ln_actvindustrial+ln_inpp, data=datos)
+prueba1_mod<-lm(score_empresasTBM~tasa_cetes+pib+td+ln_ipc+ln_actvindustrial+ln_inpp+ahorro+ln_export+inversion, data=datos)
 summary(prueba1_mod)
 #////////////////////////////////////
 
@@ -202,8 +198,6 @@ summary(prueba4_mod)
 ### Santander (Consumo)
 
 santdr_consumo<-pd_santdr$Consumo
-  
-
 
 score_consumoSANTDR<-vector()
 score_consumoSANTDR<-log(santdr_consumo/(1-santdr_consumo))

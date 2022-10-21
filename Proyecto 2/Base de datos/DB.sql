@@ -264,38 +264,133 @@ SELECT fecha, inpp FROM view_inpp;
 SELECT * FROM inpp;
 
 -- //////////////////////////////////////////////////////////////////// 
--- //// UDI
+-- //// Ahorro total 
 
 -- Creamos el esqueleto de la tabla
-CREATE TABLE tabla_udi(
-	Fecha varchar PRIMARY KEY,
-	udi varchar);
+CREATE TABLE tabla_ahorro(
+	fecha varchar PRIMARY KEY,
+	ahorro varchar);
 
--- Importamos los datos del inpp en la tabla
-SELECT * FROM tabla_udi;
-
--- Hasta aqui me quedé
+-- Importamos los datos de ahorro total en la tabla
+SELECT * FROM tabla_ahorro;
 
 -- Creamos una view segregando año y mes de cada registro
-CREATE VIEW view_inpp
+CREATE VIEW view_ahorro
 AS
 SELECT *, 
 	SUBSTRING(fecha FROM 4 FOR 2)AS month,
 	SUBSTRING(fecha FROM 7 FOR 4)AS year
-FROM tabla_inpp;
+FROM tabla_ahorro;
 
 -- Visualizamos la view creada
-SELECT * FROM view_inpp;
+SELECT * FROM view_ahorro;
 
 -- Eliminamos los registros que no son de nuestro interes
-DELETE FROM view_inpp WHERE  year<'2000' OR year>'2021';
-DELETE FROM view_inpp WHERE month<'12' and year='2000'
+DELETE FROM view_ahorro WHERE  year<'2000' OR year>'2021';
+DELETE FROM view_ahorro WHERE month<'12' and year='2000'
+
+-- Finalmente creamos la tabla con los datos de ahorro
+CREATE TABLE ahorro AS
+SELECT fecha, ahorro FROM view_ahorro;
+
+SELECT * FROM ahorro;
+
+-- //////////////////////////////////////////////////////////////////// 
+-- //// EXPORTACIONES
+
+-- Creamos el esqueleto de la tabla
+CREATE TABLE tabla_exportacion(
+	fecha varchar PRIMARY KEY,
+	exportaciones varchar);
+
+-- Importamos los datos de tasa cetes en la tabla
+SELECT * FROM tabla_exportacion;
+
+-- Creamos una view segregando año y mes de cada registro
+CREATE VIEW view_exportacion
+AS
+SELECT *, 
+	SUBSTRING(fecha FROM 4 FOR 2)AS month,
+	SUBSTRING(fecha FROM 7 FOR 4)AS year
+FROM tabla_exportacion;
+
+-- Visualizamos la view creada
+SELECT * FROM view_exportacion;
+
+-- Eliminamos los registros que no son de nuestro interes
+DELETE FROM view_exportacion WHERE  year<'2000' OR year>'2021';
+DELETE FROM view_exportacion WHERE month<'12' and year='2000'
 
 -- Finalmente creamos la tabla con los datos de inflacion
-CREATE TABLE inpp AS
-SELECT fecha, inpp FROM view_inpp;
+CREATE TABLE exportaciones AS
+SELECT fecha, exportaciones FROM view_exportacion;
 
-SELECT * FROM inpp;
+SELECT * FROM exportaciones;
+
+-- //////////////////////////////////////////////////////////////////// 
+-- //// IMPORTACIONES
+
+-- Creamos el esqueleto de la tabla
+CREATE TABLE tabla_importacion(
+	fecha varchar PRIMARY KEY,
+	importaciones varchar);
+
+-- Importamos los datos de importaciones en la tabla
+SELECT * FROM tabla_importacion;
+
+-- Creamos una view segregando año y mes de cada registro
+CREATE VIEW view_importacion
+AS
+SELECT *, 
+	SUBSTRING(fecha FROM 4 FOR 2)AS month,
+	SUBSTRING(fecha FROM 7 FOR 4)AS year
+FROM tabla_importacion;
+
+-- Visualizamos la view creada
+SELECT * FROM view_importacion;
+
+-- Eliminamos los registros que no son de nuestro interes
+DELETE FROM view_importacion WHERE  year<'2000' OR year>'2021';
+DELETE FROM view_importacion WHERE month<'12' and year='2000';
+
+-- Finalmente creamos la tabla con los datos de importaciones
+CREATE TABLE importaciones AS
+SELECT fecha, importaciones FROM view_importacion;
+
+SELECT * FROM importaciones;
+
+
+-- //////////////////////////////////////////////////////////////////// 
+-- //// INVERSIÓN FIJA
+
+-- Creamos el esqueleto de la tabla
+CREATE TABLE tabla_inversion(
+	fecha varchar PRIMARY KEY,
+	inversion varchar);
+
+-- Importamos los datos de inversion fija en la tabla
+SELECT * FROM tabla_inversion;
+
+-- Creamos una view segregando año y mes de cada registro
+CREATE VIEW view_inversion
+AS
+SELECT *, 
+	SUBSTRING(fecha FROM 4 FOR 2)AS month,
+	SUBSTRING(fecha FROM 7 FOR 4)AS year
+FROM tabla_inversion;
+
+-- Visualizamos la view creada
+SELECT * FROM view_inversion;
+
+-- Eliminamos los registros que no son de nuestro interes
+DELETE FROM view_inversion WHERE  year<'2000' OR year>'2021';
+DELETE FROM view_inversion WHERE month<'12' and year='2000';
+
+-- Finalmente creamos la tabla con los datos de importaciones
+CREATE TABLE inversion AS
+SELECT fecha, inversion FROM view_inversion;
+
+SELECT * FROM inversion;
 
 
 
@@ -310,6 +405,11 @@ SELECT * FROM td;
 SELECT * FROM ipc;
 SELECT * FROM actvind;
 SELECT* FROM inpp;
+SELECT * FROM ahorro;
+SELECT * FROM exportaciones;
+SELECT * FROM importaciones;
+SELECT * FROM inversion;
+
 
 -- Guardamos en una VIEW las tablas que hemos creado, usando como "columna join" la fecha
 CREATE VIEW view_database AS
@@ -322,7 +422,11 @@ D.tc,
 E.td,
 F.ipc,
 G.actv_industrial,
-H.inpp
+H.inpp,
+I.ahorro,
+J.exportaciones,
+K.importaciones,
+L.inversion
 FROM cetes AS A
 LEFT JOIN inflacion AS B
 ON A.fecha=B.fecha
@@ -337,7 +441,15 @@ ON A.fecha=F.fecha
 LEFT JOIN actvind AS G
 ON A.fecha=G.fecha
 LEFT JOIN inpp AS H
-ON A.fecha=H.fecha;
+ON A.fecha=H.fecha
+LEFT JOIN ahorro AS I
+ON A.fecha=I.fecha
+LEFT JOIN exportaciones AS J
+ON A.fecha=J.fecha
+LEFT JOIN importaciones AS K
+ON A.fecha=K.fecha
+LEFT JOIN inversion AS L
+ON A.fecha=L.fecha;
 
 -- Visualizamos la view creada
 SELECT * FROM view_database;
@@ -355,7 +467,11 @@ ROUND(ln(cast(tc as numeric)),5) AS ln_tc,
 ROUND(cast(td as numeric)/100,5) AS td,
 ROUND(ln(cast(ipc as numeric)),5) AS ln_ipc,
 ROUND(ln(cast(actv_industrial as numeric)),5) AS ln_actvindustrial,
-ROUND(ln(cast(inpp as numeric)),5) AS ln_inpp
+ROUND(ln(cast(inpp as numeric)),5) AS ln_inpp,
+ROUND(cast(ahorro as numeric)/100,4) AS ahorro,
+ROUND(ln(cast(exportaciones as numeric)),5) AS ln_export,
+ROUND(ln(cast(importaciones as numeric)),5) AS ln_import,
+ROUND(cast(inversion as numeric)/100,4) AS inversion
 FROM view_database;
 
 
