@@ -38,6 +38,24 @@ https://www.inegi.org.mx/app/indicadores/?tm=0&t=10200103#bodydataExplorer
 https://www.inegi.org.mx/app/indicadores/?tm=0&t=10200103#bodydataExplorer#D10200103
 
 
+Indicadores económicos de coyuntura > Indicador trimestral del ahorro bruto (porcentaje del PIB)
+https://www.inegi.org.mx/app/indicadores/?tm=0&t=10200103#bodydataExplorer#D10200103
+
+Indicadores económicos de coyuntura > Inversión fija bruta  (Variación total)
+https://www.inegi.org.mx/app/indicadores/?tm=0&t=10200103#bodydataExplorer
+
+Indicadores económicos de coyuntura > Exportaciones FOB  (Valores absolutos, millones de dólares)
+https://www.inegi.org.mx/app/indicadores/?tm=0&t=10200103#bodydataExplorer
+
+Indicadores económicos de coyuntura > Importaciones FOB (Valores absolutos)
+https://www.inegi.org.mx/app/indicadores/?tm=0&t=10200103#bodydataExplorer
+
+En EXPORTACIONES e IMPORTACIONES preferimos NO tomar variaciones (y mejor tomamos las series de valores absolutos) porque existian variaciones
+negativas, y eso implicaría que no podriamos tomar ln de los valores de la serie, y no podriamos dejarlas sin alguna transformación porque
+existen valores de variaciones del 20% o 125%, lo cual provocaría problemas de escala en nuestro modelo
+
+
+
 ## /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Otros enlaces:
 
