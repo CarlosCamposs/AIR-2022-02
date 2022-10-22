@@ -222,7 +222,7 @@ score_viviendaSANTDR<-log(santdr_vivienda/(1-santdr_vivienda))
 
 modelo6<-lm(score_viviendaSANTDR~.,data=datos)
 summary(modelo6)
-
+anova(modelo6)
 
 #////////////////////////////////////
 attach(datos)
@@ -333,7 +333,7 @@ coef(mod2)
   # https://www.datamentor.io/r-programming/s4-class/
 
 summary(mod2)
-
+anova(mod2)
 
 # Gráfica de como ajusta los datos
 # https://stackoverflow.com/questions/2564258/plot-two-graphs-in-same-plot-in-r
