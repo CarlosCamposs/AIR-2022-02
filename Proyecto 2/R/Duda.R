@@ -124,3 +124,4 @@ plot(x,sample_curve,type="l",col="red",main="PENALIZED")
 lines(x,fitted_curve2,col="green")
 
 
+
