@@ -73,6 +73,8 @@ modeloNLS_1 <- nls(formula =  score_empresasTBM ~ a+b1*tasa_cetes+b2*pib+b3*td+b
                  lower = c(a = -Inf,b1 = 0,b2 = -Inf, b3 = 0,b4 = -Inf,b5 = -Inf,b6 = 0,b7=-Inf,b8=-Inf, b9=-Inf),
                  upper = c(a = Inf,b1 = Inf,b2 = 0, b3 = Inf,b4 = 0,b5=0,b6=Inf,b7=0,b8=0,b9=0),
                  algorithm = "port") 
+summary(modeloNLS_1)
+
 
 # Visualizamos los resultados de los coeficientes
 c.modeloNLS_1 <- data.frame(t(coef(modeloNLS_1))) 
@@ -304,6 +306,18 @@ score_viviendaSANTDR<-log(santdr_vivienda/(1-santdr_vivienda))
 modelo6<-lm(score_viviendaSANTDR~.,data=datos)
 step(modelo6,direction="both",trace=0)
 
+# Creamos las PD
+fitted_curve6<-1/(1+exp(-modelo6$fitted.values))
+sample_curve<-1/(1+exp(-score_viviendaSANTDR))
+x<-1:204
+
+# Creamos el gráfico
+plot(x,sample_curve,type="l",col="red",main="LM")
+lines(x,fitted_curve6,col="green")
+
+
+
+# Modelo con las variables de STEP()
 modeloNLS_6 <- nls(formula =  score_viviendaSANTDR ~ a + b1*tasa_cetes +  b2*pib + b3*ln_tc+b4*td+b5*ln_ipc+b6*ahorro,
                  data = datos, 
                  start = list(a = 0,b1 = 0.0,b2 = 0, b3 = 0,b4 = 0,b5 = 0,b6 = 0),
@@ -311,6 +325,15 @@ modeloNLS_6 <- nls(formula =  score_viviendaSANTDR ~ a + b1*tasa_cetes +  b2*pib
                  upper = c(a = Inf,b1 = Inf,b2 = 0, b3 = Inf,b4 = Inf,b5=0,b6=0),
                  algorithm = "port") 
 
+# Modleo con todas las variables
+modeloNLS_7 <- nls(formula =  score_viviendaSANTDR ~ a+b1*tasa_cetes+b2*inflacion+b3*pib+b4*ln_tc+b5*td+b6*ln_ipc+b7*ln_actvindustrial+b8*ln_inpp+b9*ahorro+b10*ln_export+b11*ln_import+b12*inversion,
+                   data = datos, 
+                   start = list(a = 0,b1 = 0.0,b2 = 0, b3 = 0,b4 = 0,b5 = 0,b6 = 0,b7 = 0,b8=0,b9=0,b10=0,b11=0,b12=0),
+                   lower = c(a = -Inf,b1 = 0,b2 = 0, b3 = -Inf,b4 = 0,b5 = 0,b6 = -Inf,b7=-Inf,b8=0,b9=-Inf,b10=-Inf,b11=-Inf,b12=-Inf),
+                   upper = c(a = Inf,b1 = Inf,b2 = Inf, b3 = 0,b4 = Inf,b5=Inf,b6=0,b7=0,b8=Inf,b9=0,b10=0,b11=Inf,b12=0),
+                   algorithm = "port") 
+
+# MODELO NLS_6
 # Visualizamos los resultados de los coeficientes
 c.modeloNLS_6 <- data.frame(t(coef(modeloNLS_6))) 
 colnames(c.modeloNLS_6) <- c("(Intercept)",colnames(datos)[c(1,3,4,5,6,9)])
@@ -324,10 +347,39 @@ sample_curve<-1/(1+exp(-score_viviendaSANTDR))
 x<-1:204
 
 # Creamos el gráfico
-plot(x,sample_curve,type="l",col="red",main="NLS")
+plot(x,sample_curve,type="l",col="red",main="NLS_6")
 lines(x,fitted_curve6,col="green")
 
+######
 
+# MODELO NLS_7
+# Visualizamos los resultados de los coeficientes
+c.modeloNLS_7 <- data.frame(t(coef(modeloNLS_7))) 
+colnames(c.modeloNLS_7) <- c("(Intercept)",colnames(datos))
+knitr::kable(c.modeloNLS_7, caption = "Forced Coefficients")
+
+summary(modeloNLS_7)
+summary(modeloNLS_6)
+
+RSS.p6<-sum(residuals(modeloNLS_6 )^2)
+RSS.p6
+RSS.p7<-sum(residuals(modeloNLS_7 )^2)
+RSS.p7
+
+
+# Gráfico
+
+# Creamos las PD
+fitted_curve7<-1/(1+exp(-modeloNLS_7$m$fitted()))
+sample_curve<-1/(1+exp(-score_viviendaSANTDR))
+x<-1:204
+
+# Creamos el gráfico
+plot(x,sample_curve,type="l",col="red",main="NLS_7")
+lines(x,fitted_curve7,col="green")
+
+
+################3
 # Para calcular el R2
 RSS.p<-sum(residuals(modeloNLS_6 )^2)
 TSS<-sum((score_viviendaSANTDR-mean(score_viviendaSANTDR))^2)
