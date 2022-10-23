@@ -88,12 +88,14 @@ score_empresasTBM
 
 # Creamos las PD
 fitted_curve1<-1/(1+exp(-modeloNLS_1$m$fitted()))
+fitted_curve11<-1/(1+exp(-prueba1_mod$fitted.values))
 sample_curve<-1/(1+exp(-score_empresasTBM))
 x<-1:204
 
 # Creamos el gráfico
 plot(x,sample_curve,type="l",col="red",main="NLS")
 lines(x,fitted_curve1,col="green")
+lines(x,fitted_curve11,col="blue")
 
 
 # Para calcular el R2
