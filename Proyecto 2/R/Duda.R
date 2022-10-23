@@ -120,7 +120,7 @@ TSS<-sum((score_viviendaSANTDR-mean(score_viviendaSANTDR))^2)
 
 
 
-
+# A esto que está abajo ya no le hagas caso we
 
 # ////////////////////////////////////////////////////////////////////
 # Modelo con PENALIZED
