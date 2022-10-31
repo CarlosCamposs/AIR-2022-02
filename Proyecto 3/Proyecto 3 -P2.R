@@ -17,7 +17,8 @@ precios1<-MSFT$MSFT.Close
 precios2<-TSLA$TSLA.Close
 precios3<-AMZN$AMZN.Close
 precios4<-AAPL$AAPL.Close
-#
+# Hacemos el codigo solo para cuatro acciones
+
 precios5<-NVDA$NVDA.Close
 precios6<-BAC$BAC.Close
 precios7<-WALMEX.MX$WALMEX.MX.Close
@@ -25,42 +26,44 @@ precios8<-NFLX$NFLX.Close
 precios9<-BIMBOA.MX$BIMBOA.MX.Close
 precios10<-ELEKTRA.MX$ELEKTRA.MX.Close
 
-tabla_precios<-cbind(precios1,precios2,precios3,precios4)
+# Unimos todos los precios de cierre en una tabla
+  tabla_precios<-cbind(precios1,precios2,precios3,precios4)
 
-tabla_precios<-as.data.frame(tabla_precios)
-
-
-# Rendimientos - Portafolio
-tabla_rendimientos<-data.frame()
-
-for(i in 1:4){
-
-  for (j in 1:length(tabla_precios$MSFT.Close)){
-    tabla_rendimientos[j,i]<-tabla_precios[j+1,i]/tabla_precios[j,i]-1
-  }  
+# Declaramos como dataframe a la tabla recien creada
+  tabla_precios<-as.data.frame(tabla_precios)
 
   
-}
+#######################
+# Rendimientos - Portafolio
+  
+tabla_rendimientos<-data.frame()
+  for(i in 1:4){
+
+      for (j in 1:length(tabla_precios$MSFT.Close)){
+        tabla_rendimientos[j,i]<-tabla_precios[j+1,i]/tabla_precios[j,i]-1
+      }  
+  }
 
 
-# Ultimo precio - Portafolio
-ultimo_precio<-tabla_precios[c(length(tabla_precios$MSFT.Close)),]
-ultimo_precio<-as.data.frame(ultimo_precio)
+# Ultimo precio - Portafolio  
+  ultimo_precio<-tabla_precios[c(length(tabla_precios$MSFT.Close)),]
+  ultimo_precio<-as.data.frame(ultimo_precio)
 
 
 # Revaluacion - Portafolio
-tabla_revaluacion<-data.frame()
-for(i in 1:4){
-  
-  for( j in 1:length(tabla_rendimientos$V1)){
-    tabla_revaluacion[j,i]<-ultimo_precio[,i]*(1+tabla_rendimientos[j,i])
-    }
 
-}
+tabla_revaluacion<-data.frame()
+  for(i in 1:4){
+  
+      for( j in 1:length(tabla_rendimientos$V1)){
+        tabla_revaluacion[j,i]<-ultimo_precio[,i]*(1+tabla_rendimientos[j,i])
+      } 
+
+  }
 
 # P&L individual
-tabla_revaluacion<-tabla_revaluacion[c(-length(tabla_revaluacion$V1)),]
-
+  tabla_revaluacion<-tabla_revaluacion[c(-length(tabla_revaluacion$V1)),]
+    #  debe haber 1174
 
 # P&L individual
 PL1<-data.frame()
@@ -69,24 +72,23 @@ PL3<-data.frame()
 PL4<-data.frame()
 
 
-for (j in 1:length(tabla_revaluacion$V1)){
-  PL1[j,1]<-ultimo_precio[1]-tabla_revaluacion[j,1]
-  PL2[j,1]<-ultimo_precio[2]-tabla_revaluacion[j,2]
-  PL3[j,1]<-ultimo_precio[3]-tabla_revaluacion[j,3]
-  PL4[j,1]<-ultimo_precio[4]-tabla_revaluacion[j,4]
-  
-  
-  PL_Portafolio<-cbind(PL1,PL2,PL3,PL4)
-    }
+  for (j in 1:length(tabla_revaluacion$V1)){
+      PL1[j,1]<-ultimo_precio[1]-tabla_revaluacion[j,1]
+      PL2[j,1]<-ultimo_precio[2]-tabla_revaluacion[j,2]
+      PL3[j,1]<-ultimo_precio[3]-tabla_revaluacion[j,3]
+      PL4[j,1]<-ultimo_precio[4]-tabla_revaluacion[j,4]
 
-PL_Portafolio
+      PL_Portafolio<-cbind(PL1,PL2,PL3,PL4)
+  }
 
+head(PL_Portafolio,5)
 
 # P&L - Portafolio
+  # Creamos una nueva column en PL_Portafolio donde sea la P&L del portafolio (la suma)
+  for(i in 1:length(PL_Portafolio$MSFT.Close)){
+    PL_Portafolio$PL[i]<-rowSums(PL_Portafolio[i,])
+  }
 
-for(i in 1:length(PL_Portafolio$MSFT.Close)){
-  PL_Portafolio$PL[i]<-rowSums(PL_Portafolio[i,])
-}
 
 head(PL_Portafolio,5)
 
@@ -98,8 +100,8 @@ head(PL_Portafolio,5)
 
 # VaR - Portafolio (Simulacion Historica - 1 día)
 alpha<-c(0.95,0.975,0.99)
-
 VaR_SH1<-quantile(PL_Portafolio$PL,probs = alpha)
+
 
 VaR_SH<-rbind(VaR_SH1,VaR_SH1*30,VaR_SH1*180,VaR_SH1*360)
 rownames(VaR_SH)<-c("1 dia","30 dias","180 dias", "360 dias")
@@ -125,37 +127,31 @@ sd
   
 
 # Revaluacion
-ultimo_precio
+  ultimo_precio
 
 tabla_revaluacionSM<-data.frame()
-for(i in 1:4){
+  for(i in 1:4){
   
-  for( j in 1:length(tabla_rendimientos$V1)){
-    tabla_revaluacionSM[j,i]<-ultimo_precio[,i]*(1+tabla_rendimientos[j,i+4])
+      for( j in 1:length(tabla_rendimientos$V1)){
+        tabla_revaluacionSM[j,i]<-ultimo_precio[,i]*(1+tabla_rendimientos[j,i+4])
+      }
   }
-  
-}
 
 # P&L indivual
-PL1_SM<-data.frame()
-PL2_SM<-data.frame()
-PL3_SM<-data.frame()
-PL4_SM<-data.frame()
+  PL1_SM<-data.frame()
+  PL2_SM<-data.frame()
+  PL3_SM<-data.frame()
+  PL4_SM<-data.frame()
 
-
-
-for (j in 1:length(tabla_revaluacionSM$V1)){
-  PL1_SM[j,1]<-ultimo_precio[1]-tabla_revaluacionSM[j,1]
-  PL2_SM[j,1]<-ultimo_precio[2]-tabla_revaluacionSM[j,2]
-  PL3_SM[j,1]<-ultimo_precio[3]-tabla_revaluacionSM[j,3]
-  PL4_SM[j,1]<-ultimo_precio[4]-tabla_revaluacionSM[j,4]
+  for (j in 1:length(tabla_revaluacionSM$V1)){
+    PL1_SM[j,1]<-ultimo_precio[1]-tabla_revaluacionSM[j,1]
+    PL2_SM[j,1]<-ultimo_precio[2]-tabla_revaluacionSM[j,2]
+    PL3_SM[j,1]<-ultimo_precio[3]-tabla_revaluacionSM[j,3]
+    PL4_SM[j,1]<-ultimo_precio[4]-tabla_revaluacionSM[j,4]
   
-  
-  PL_PortafolioSM<-cbind(PL1_SM,PL2_SM,PL3_SM,PL4_SM)
-}
+    PL_PortafolioSM<-cbind(PL1_SM,PL2_SM,PL3_SM,PL4_SM)
+  }
 
-# P&L de cada accion
-PL_PortafolioSM
 
 # P&L del Portafolio
 
@@ -165,10 +161,11 @@ for(i in 1:length(PL_PortafolioSM$MSFT.Close)){
   PL_SM[i,1]<-rowSums(PL_PortafolioSM[i,])
 }
 
+head(PL_SM,5)
 
-alpha<-c(0.95,0.975,0.99)
 
 # VaR por Simulacion de Montecarlo 
+alpha<-c(0.95,0.975,0.99)
 VaR_SM1<-quantile(PL_SM$V1,probs=alpha) # 1 dia
   
 
