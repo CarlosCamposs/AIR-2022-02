@@ -57,17 +57,9 @@ library(knitr) #for kable()
 # VaR no parametrico (1 dia)
   VaR_SH1<-quantile(PL,probs=alpha)
 
-# VaR no parametrico (30 dia)
-  VaR_SH30<-VaR_SH1*30
-
-# VaR no parametrico (180 dia)
-  VaR_SH180<-VaR_SH1*180
-
-# VaR no parametrico (360 dia)
-  VaR_SH360<-VaR_SH1*360
 
 # Resultado
-VaR_SH<-rbind(VaR_SH1,VaR_SH30,VaR_SH180,VaR_SH360)
+VaR_SH<-rbind(VaR_SH1,VaR_SH1*30,VaR_SH1*180,VaR_SH1*360)
 rownames(VaR_SH)<-c("1 dia","30 dias","180 dias", "360 dias")
   
   kable(VaR_SH,digits=4,caption = "Método de Simulación Histórica")
@@ -244,11 +236,11 @@ head(Alisado,5) # Alisado es un vector
 
 # VaR al 975% (1 día)
   tabla2<-Tabla_Alisado[which(Tabla_Alisado$Fx>=0.975),]
-  VaRAE_975<-tabla1[length(tabla2$PL),"PL"]
+  VaRAE_975<-tabla2[length(tabla2$PL),"PL"]
 
 # VaR al 99% (1 día)
   tabla3<-Tabla_Alisado[which(Tabla_Alisado$Fx>=0.99),]
-  VaRAE_99<-tabla1[length(tabla3$PL),"PL"]
+  VaRAE_99<-tabla3[length(tabla3$PL),"PL"]
 
 
 VaR_1<-cbind(VaRAE_95,VaRAE_975,VaRAE_99) 

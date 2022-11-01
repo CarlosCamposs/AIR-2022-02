@@ -178,6 +178,132 @@ kable(VaR_SM,digits=4,caption = "Método de Simulación de Montecarlo- Portafoli
 # //////////////////////////////////////////////////////////////////////////////////  
 # //////////////////////////////////////////////////////////////////////////////////  
 # Simulacion Bootstrapping - Portafolio
+        # Remuestreo con la P&L del portafolio
+
+head(PL_Portafolio,5)
+
+
+VaRB95<-vector()  
+VaRB975<-vector()  
+VaRB99<-vector()  
+
+
+for(i in 1:5000){
+  
+  # Sample con replace=T
+  remuestreoBoots<-sample(PL_Portafolio$PL, size=length(PL_Portafolio$PL), replace = TRUE)
+  
+  # VaR  
+  VaR_B95<-quantile(remuestreoBoots,0.95)
+  VaR_B975<-quantile(remuestreoBoots,0.975)
+  VaR_B99<-quantile(remuestreoBoots,0.99)
+  
+  VaRB95[i]<-VaR_B95  
+  VaRB975[i]<-VaR_B975  
+  VaRB99[i]<-VaR_B99  
+}
+
+
+# VaR Boostrapping (1 dia)
+VaRBoots95<-mean(VaRB95)
+VaRBoots975<-mean(VaRB975)
+VaRBoots99<-mean(VaRB99)
+
+VaR_B1<-cbind(VaRBoots95,VaRBoots975,VaRBoots99)
+colnames(VaR_B1)<-c("95%","97.5%","99%")
+VaR_B1
+
+VaR_B<-rbind(VaR_B1,VaR_B1*30,VaR_B1*180,VaR_B1*360)
+rownames(VaR_B)<-c("1 dia","30 dias","180 dias", "360 dias")
+
+kable(VaR_B,digits=4,caption = "Método de Simulación Bootstrapping- Portafolio")
+
+
+# //////////////////////////////////////////////////////////////////////////////////  
+# //////////////////////////////////////////////////////////////////////////////////  
+# Simulacion con Alisado Exponencial - Portafolio
+head(PL_Portafolio,5)
+
+
+PL_AE<-PL_Portafolio$PL 
+#PL_AE<-as.data.frame(PL_AE)
+
+a<-0.95
+b<-0.05
+
+# Indicador
+j<-length(PL_AE)-1
+Alisado<-vector()
+
+for(i in 0:j){
+  
+  Alisado[length(PL_AE)-i]<-a^(i)*b
+  
+}
+
+
+# Unimos en una tabla la P&L y el Alisado
+Tabla_Alisado<-cbind(PL_AE,Alisado)
+colnames(Tabla_Alisado)<-c("PL","Alisado")
+head(Tabla_Alisado)
+
+
+# Lo convertimos a dataframe
+Tabla_Alisado<-as.data.frame(Tabla_Alisado)
+
+# Ordenamos tabla de forma descendente basandonos en la columna P&L
+Tabla_Alisado <- Tabla_Alisado[with(Tabla_Alisado, order(-Tabla_Alisado$PL)), ] 
+head(Tabla_Alisado)
+
+# Creamos la columna de Fx
+Alisado2<-Tabla_Alisado$Alisado
+head(Alisado2)
+
+Fx<-vector()
+
+  for(i in 1:length(Alisado2)){
+    Fx[i]<-sum(Alisado2[i:length(Alisado2)])
+  }
+
+head(Fx,15)
+
+# Unimos la columna de Fx con la Tabla_Alisado
+Tabla_Alisado<-cbind(Tabla_Alisado,Fx)
+head(Tabla_Alisado)
+
+
+# VaR Alisado Exponencial (1 dia)
+
+  # VaR al 95% (1 día)
+    tabla1<-Tabla_Alisado[which(Tabla_Alisado$Fx>=0.95),]
+    VaRAE_95<-tabla1[length(tabla1$PL),"PL"]
+
+  # VaR al 975% (1 día)
+    tabla2<-Tabla_Alisado[which(Tabla_Alisado$Fx>=0.975),]
+    VaRAE_975<-tabla2[length(tabla2$PL),"PL"]
+
+    
+  # VaR al 99% (1 día)
+    tabla3<-Tabla_Alisado[which(Tabla_Alisado$Fx>=0.99),]
+    VaRAE_99<-tabla3[length(tabla3$PL),"PL"]
+
+
+VaR_AE1<-cbind(VaRAE_95,VaRAE_975,VaRAE_99) 
+colnames(VaR_AE1) <-c("95%","97.5%","99%")
+
+VaR_AE<-rbind(VaR_AE1,VaR_AE1*30,VaR_AE1*180,VaR_AE1*360)
+rownames(VaR_AE)<-c("1 dia","30 dias","180 dias", "360 dias")
+
+kable(VaR_AE,digits=4,caption = "Método con Alisado Exponencial- Portafolio")
+
+
+# //////////////////////////////////////////////////////////////////////////////////  
+# //////////////////////////////////////////////////////////////////////////////////  
+
+
+
+
+
 
 
 
