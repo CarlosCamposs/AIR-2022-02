@@ -86,7 +86,7 @@ F<-qnorm(alpha,mean=0,sd=1)
 tiempo1<-sqrt(1)
   
 
-matriz<-cor(tabla_rendimientos)  
+matriz<-cov(tabla_rendimientos)
 q<-matrix(participacion,nrow=1,ncol=4)
 
 
