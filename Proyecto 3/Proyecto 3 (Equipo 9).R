@@ -46,21 +46,25 @@ library(knitr) #for kable()
   PL<-ultimo_precio-revaluacion
   colnames(PL)<-"PL"
   head(PL,5)
-  
+
+    
 # //////////////////////////////////////////////////////////////////////////////////  
 # //////////////////////////////////////////////////////////////////////////////////  
-# Simulacion Historica
+# Metodo de Simulacion Historica
   
 # Niveles de confianza
   alpha<-c(0.95,0.975,0.99)
+
   
-# VaR no parametrico (1 dia)
+#######################
+# VaR No Parametrico (Simulacion Historica - 1 dia)
   VaR_SH1<-quantile(PL,probs=alpha)
 
+#######################
+# Resultados
 
-# Resultado
-VaR_SH<-rbind(VaR_SH1,VaR_SH1*30,VaR_SH1*180,VaR_SH1*360)
-rownames(VaR_SH)<-c("1 dia","30 dias","180 dias", "360 dias")
+  VaR_SH<-rbind(VaR_SH1,VaR_SH1*30,VaR_SH1*180,VaR_SH1*360)
+  rownames(VaR_SH)<-c("1 dia","30 dias","180 dias", "360 dias")
   
   kable(VaR_SH,digits=4,caption = "Método de Simulación Histórica")
 
@@ -69,11 +73,13 @@ rownames(VaR_SH)<-c("1 dia","30 dias","180 dias", "360 dias")
 
 # //////////////////////////////////////////////////////////////////////////////////  
 # //////////////////////////////////////////////////////////////////////////////////  
-# Montecarlo
+# Metodo de Simulacion Montecarlo
+  
+# Calculamos la media y los rendimientos de la emisora  
+  mean<-mean(rendimientos)  
+  sd<-sd(rendimientos)  
 
-mean<-mean(rendimientos)  
-sd<-sd(rendimientos)  
-
+  
 VaRSM95<-vector()  
 VaRSM975<-vector()  
 VaRSM99<-vector()  
@@ -89,38 +95,35 @@ for(i in 1:5000){
   # P&L
   PL_SM<-ultimo_precio-revaluacionSM
   
-  # VaR  
+  # Calculamos el VaR a diferentes niveles de confianza  
   VaR_SM95<-quantile(PL_SM,0.95)
   VaR_SM975<-quantile(PL_SM,0.975)
   VaR_SM99<-quantile(PL_SM,0.99)
   
-VaRSM95[i]<-VaR_SM95  
-VaRSM975[i]<-VaR_SM975  
-VaRSM99[i]<-VaR_SM99  
+  # Guardamos los VaR en vectores
+  VaRSM95[i]<-VaR_SM95  
+  VaRSM975[i]<-VaR_SM975  
+  VaRSM99[i]<-VaR_SM99  
 
 }
 
-# VaR Montecarlo (1 dia)
+
+#######################
+# VaR No Parametrico (Simulacion de Montecarlo - 1 dia)
+
 VaR_Montecarlo95<-mean(VaRSM95)
 VaR_Montecarlo975<-mean(VaRSM975)
 VaR_Montecarlo99<-mean(VaRSM99)
 
-VaR_1<-cbind(VaR_Montecarlo95,VaR_Montecarlo975,VaR_Montecarlo99)
-colnames(VaR_1)<-c("95%","97.5%","99%")
-
-# VaR Montecarlo (30 dia)
-VaR_30<-VaR_1*30
-
-# VaR Montecarlo (180 dia)
-VaR_180<-VaR_1*180
-
-# VaR Montecarlo (360 dia)
-VaR_360<-VaR_1*360
+  VaR_SM1<-cbind(VaR_Montecarlo95,VaR_Montecarlo975,VaR_Montecarlo99)
+  colnames(VaR_SM1)<-c("95%","97.5%","99%")
 
 
+#######################
 # Resultados
-VaR_SM<-rbind(VaR_1,VaR_30,VaR_180,VaR_360)
-rownames(VaR_SM)<-c("1 dia", "30 dias", "180 dias", "360 dias")
+
+  VaR_SM<-rbind(VaR_SM1,VaR_SM1*30,VaR_SM1*180,VaR_SM1*360)
+  rownames(VaR_SM)<-c("1 dia", "30 dias", "180 dias", "360 dias")
 
   kable(VaR_SM,digist=4, caption="Método de Simulación MonteCarlo")
   
@@ -130,8 +133,7 @@ rownames(VaR_SM)<-c("1 dia", "30 dias", "180 dias", "360 dias")
 # Bootstrapping
 
 # Funcion de P&L
-PL<-ultimo_precio-revaluacion
-
+head(PL,5)
 
 VaRB95<-vector()  
 VaRB975<-vector()  
@@ -140,41 +142,37 @@ VaRB99<-vector()
 
   for(i in 1:5000){
   
-    # Sample con replace=T
+    # Hacemos un remuestreo con la P&L
       remuestreoBoots<-sample(PL, size=length(PL), replace = TRUE)
 
-    # VaR  
+    # Calculamos el VaR con diferentes niveles de confianza  
       VaR_B95<-quantile(remuestreoBoots,0.95)
       VaR_B975<-quantile(remuestreoBoots,0.975)
       VaR_B99<-quantile(remuestreoBoots,0.99)
-  
+
+    # Metemos los VaR calculados en un vector  
       VaRB95[i]<-VaR_B95  
       VaRB975[i]<-VaR_B975  
       VaRB99[i]<-VaR_B99  
     }
 
 
-# VaR Boostrapping (1 dia)
-  VaRBoots95<-mean(VaRB95)
-  VaRBoots975<-mean(VaRB975)
-  VaRBoots99<-mean(VaRB99)
+#######################
+# VaR No Parametrico (Simulacion de Montecarlo - 1 dia)
+  
+VaRBoots95<-mean(VaRB95)
+VaRBoots975<-mean(VaRB975)
+VaRBoots99<-mean(VaRB99)
 
-  VaR_1<-cbind(VaRBoots95,VaRBoots975,VaRBoots99)
-  colnames(VaR_1)<-c("95%","97.5%","99%")
+  VaR_B1<-cbind(VaRBoots95,VaRBoots975,VaRBoots99)
+  colnames(VaR_B1)<-c("95%","97.5%","99%")
 
-# VaR Boostrapping (30 dia)
-  VaR_30<-VaR_1*30
-
-# VaR Boostrapping (180 dia)
-  VaR_180<-VaR_1*180
-
-# VaR Boostrapping (360 dia)
-  VaR_360<-VaR_1*360
-
-
+  
+#######################
 # Resultados
-VaR_B<-rbind(VaR_1,VaR_30,VaR_180,VaR_360)
-rownames(VaR_B)<-c("1 dia", "30 dias", "180 dias", "360 dias")
+
+  VaR_B<-rbind(VaR_B1,VaR_B1*30,VaR_B1*180,VaR_B1*360)
+  rownames(VaR_B)<-c("1 dia", "30 dias", "180 dias", "360 dias")
 
   kable(VaR_B,digist=4, caption="Método Bootstrapping")
   
@@ -183,12 +181,16 @@ rownames(VaR_B)<-c("1 dia", "30 dias", "180 dias", "360 dias")
 # //////////////////////////////////////////////////////////////////////////////////  
 # Alisado Exponencial
 
+head(PL,5)  
+  
+# Definimos los coeficientes alpha y beta  
 a<-0.95
 b<-0.05
-PL<-ultimo_precio-revaluacion
 
-# Indicador
-j<-length(PL)-1
+
+# Creamos la funcion de alisado exponencial
+
+j<-length(PL)-1 # Indicador
 Alisado<-vector()
 
 
@@ -200,35 +202,43 @@ Alisado<-vector()
 
 head(Alisado,5) # Alisado es un vector
 
+
 # Unimos en una tabla la P&L y el Alisado
   Tabla_Alisado<-cbind(PL,Alisado)
   colnames(Tabla_Alisado)<-c("PL","Alisado")
   head(Tabla_Alisado)
 
+  
 # Lo convertimos a dataframe
   Tabla_Alisado<-as.data.frame(Tabla_Alisado)
 
+  
 # Ordenamos tabla de forma descendente basandonos en la columna P&L
   Tabla_Alisado <- Tabla_Alisado[with(Tabla_Alisado, order(-Tabla_Alisado$PL)), ] 
   head(Tabla_Alisado)
 
+  
 # Creamos la columna de Fx
+  
   Alisado2<-Tabla_Alisado$Alisado
   head(Alisado2)
 
   Fx<-vector()
+  
   for(i in 1:length(Alisado2)){
     Fx[i]<-sum(Alisado2[i:length(Alisado2)])
   }
   
   head(Fx,15)
 
+  
 # Unimos la columna de Fx con la Tabla_Alisado
   Tabla_Alisado<-cbind(Tabla_Alisado,Fx)
   head(Tabla_Alisado)
 
 
-# VaR Alisado Exponencial (1 dia)
+#######################
+# VaR No Parametrico (Alisado Exponencial - 1 dia)
   
 # VaR al 95% (1 día)
   tabla1<-Tabla_Alisado[which(Tabla_Alisado$Fx>=0.95),]
@@ -243,22 +253,15 @@ head(Alisado,5) # Alisado es un vector
   VaRAE_99<-tabla3[length(tabla3$PL),"PL"]
 
 
-VaR_1<-cbind(VaRAE_95,VaRAE_975,VaRAE_99) 
-colnames(VaR_1) <-c("95%","97.5%","99%")
-
-# VaR Alisado Exponencial (30 dia)
-VaR_30<-VaR_1*30
-
-# VaR Alisado Exponencial (180 dia)
-VaR_180<-VaR_1*180
-
-# VaR Alisado Exponencial (360 dia)
-VaR_360<-VaR_1*360
+VaR_AE1<-cbind(VaRAE_95,VaRAE_975,VaRAE_99) 
+colnames(VaR_AE1) <-c("95%","97.5%","99%")
 
 
+#######################
 # Resultados
-VaR_AE<-rbind(VaR_1,VaR_30,VaR_180,VaR_360)
-rownames(VaR_AE)<-c("1 día", "30 días", "180 días", "360 días")
+  
+  VaR_AE<-rbind(VaR_AE1,VaR_AE1*30,VaR_AE1*180,VaR_AE1*360)
+  rownames(VaR_AE)<-c("1 día", "30 días", "180 días", "360 días")
 
   kable(VaR_AE,digits =4, caption="Método de Alisado Exponencial")
 
