@@ -6,17 +6,27 @@ library(tidyquant)
 library(quantmod)
 library(knitr) #for kable()
 
+#######################
+#Nota
+
+# El codigo solo esta hecho para mostrar los resultados de una emisora a la vez, para
+# seleccionar otra emisora solo se debe cambiar manualmente el nombre de la emisora 
+# deseada en las lineas de codigo con numero: 23 y 29
 
 #######################
 # Cargamos los datos
-  cartera = c("BAC")
-  getSymbols(cartera,src = "yahoo",from="2018-01-01",to="2022-09-01")
-  head(BAC,n=3)
 
+# cartera=c("WALMEX.MX","AMXL.MX","GFNORTEO.MX",
+#          "GMEXICOB.MX","TLEVISACPO.MX","KIMBERA.MX",
+#          "GCARSOA1.MX","GAPB.MX","PE&OLES.MX"."LABB.MX")
+
+  cartera = c("GFNORTEO.MX")
+  getSymbols(cartera,src = "yahoo",from="2018-01-01",to="2022-09-01")
+  
 
 #######################
 # Precios de cierre
-  precios<-BAC$BAC.Close
+  precios<-GFNORTEO.MX$GFNORTEO.MX.Close
   colnames(precios)<-c("Precios de cierre")
   head(precios,5)
 
@@ -67,9 +77,18 @@ library(knitr) #for kable()
   rownames(VaR_SH)<-c("1 dia","30 dias","180 dias", "360 dias")
   
   kable(VaR_SH,digits=4,caption = "Método de Simulación Histórica")
+  
 
+#######################
+# Verificacion de resultados
+  
+  d <- density(PL) # returns the density data
+  plot(d,main = "Densidad de P&L - Simulacion Historica")
+  abline(v = VaR_SH1, col="red", lwd=3, lty=2)
+  abline(v = quantile(PL,alpha), col="blue", lwd=3, lty=2)
+  
 
-
+  
 
 # //////////////////////////////////////////////////////////////////////////////////  
 # //////////////////////////////////////////////////////////////////////////////////  
@@ -127,6 +146,16 @@ VaR_Montecarlo99<-mean(VaRSM99)
 
   kable(VaR_SM,digist=4, caption="Método de Simulación MonteCarlo")
   
+  
+#######################
+# Verificacion de resultados
+  
+  d <- density(PL_SM) # returns the density data
+  plot(d,main = "Densidad de P&L - Montecarlo")
+  abline(v = VaR_SM1, col="red", lwd=3, lty=2)
+  abline(v = quantile(PL_SM,alpha), col="blue", lwd=3, lty=2)
+  
+  
 
 # //////////////////////////////////////////////////////////////////////////////////  
 # //////////////////////////////////////////////////////////////////////////////////  
@@ -158,7 +187,7 @@ VaRB99<-vector()
 
 
 #######################
-# VaR No Parametrico (Simulacion de Montecarlo - 1 dia)
+# VaR No Parametrico (Simulacion Bootstrapping - 1 dia)
   
 VaRBoots95<-mean(VaRB95)
 VaRBoots975<-mean(VaRB975)
@@ -175,7 +204,18 @@ VaRBoots99<-mean(VaRB99)
   rownames(VaR_B)<-c("1 dia", "30 dias", "180 dias", "360 dias")
 
   kable(VaR_B,digist=4, caption="Método Bootstrapping")
+
+
+#######################
+# Verificacion de resultados
   
+  d <- density(remuestreoBoots) # returns the density data
+  plot(d,main = "Densidad de P&L - Bootstrapping")
+  abline(v = VaR_B1, col="red", lwd=3, lty=2)
+  abline(v = quantile(remuestreoBoots,alpha), col="blue", lwd=3, lty=2)
+  
+  
+    
 
 # //////////////////////////////////////////////////////////////////////////////////  
 # //////////////////////////////////////////////////////////////////////////////////  
@@ -229,7 +269,7 @@ head(Alisado,5) # Alisado es un vector
     Fx[i]<-sum(Alisado2[i:length(Alisado2)])
   }
   
-  head(Fx,15)
+  head(Fx,30)
 
   
 # Unimos la columna de Fx con la Tabla_Alisado
@@ -265,8 +305,17 @@ colnames(VaR_AE1) <-c("95%","97.5%","99%")
 
   kable(VaR_AE,digits =4, caption="Método de Alisado Exponencial")
 
+  
+# Aqui ya no se pueden comprobar los resultados con una funcion de densidad pues
+# las probabilidades no son uniformes  
 
 # //////////////////////////////////////////////////////////////////////////////////  
+# //////////////////////////////////////////////////////////////////////////////////  
+# RECOPILACION DE RESULTADOS DE LA EMISORA  
 
 
-
+  kable(VaR_SH,digits=4,caption = "Método de Simulación Histórica")
+  kable(VaR_SM,digist=4, caption="Método de Simulación MonteCarlo")
+  kable(VaR_B,digist=4, caption="Método Bootstrapping")
+  kable(VaR_AE,digits =4, caption="Método de Alisado Exponencial")
+  
