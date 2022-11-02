@@ -13,7 +13,7 @@ library(knitr) #for kable()
           "GMEXICOB.MX","TLEVISACPO.MX","KIMBERA.MX",
           "GCARSOA1.MX","GAPB.MX","PE&OLES.MX","LABB.MX")
 
-  getSymbols(cartera,src = "yahoo",from="2019-01-01",to="2022-09-01")
+  getSymbols(cartera,src = "yahoo",from="2019-01-01",to="2022-09-30")
 
 
 #######################
@@ -112,11 +112,16 @@ head(PL_Portafolio,5)
 # P&L - Portafolio
 
 # Creamos una nueva columna en PL_Portafolio donde sea la P&L del portafolio (la suma)
-  
+
+PL_Port<-data.frame()
   for(i in 1:length(PL_Portafolio$WALMEX.MX.Close)){
-    PL_Portafolio$PL[i]<-rowSums(PL_Portafolio[i,])
+    PL_Port[i,1]<-rowSums(PL_Portafolio[i,])
   }
 
+colnames(PL_Port)<-c("PL")
+
+
+PL_Portafolio<-cbind(PL_Portafolio,PL_Port)
 
 head(PL_Portafolio,5)
 
@@ -309,7 +314,6 @@ Alisado<-vector()
   
   }
 
-
 # Unimos en una tabla la P&L y el Alisado
   Tabla_Alisado<-cbind(PL_AE,Alisado)
   colnames(Tabla_Alisado)<-c("PL","Alisado")
@@ -374,7 +378,7 @@ head(Tabla_Alisado)
 # //////////////////////////////////////////////////////////////////////////////////  
 # RECOPILACION DE RESULTADOS DEL PORTAFOLIO  
   
-
+  
   kable(VaR_SH,digits=4,caption = "Método de Simulación Histórica - Portafolio")
   kable(VaR_SM,digits=4,caption = "Método de Simulación de Montecarlo- Portafolio")
   kable(VaR_B,digits=4,caption = "Método de Simulación Bootstrapping- Portafolio")

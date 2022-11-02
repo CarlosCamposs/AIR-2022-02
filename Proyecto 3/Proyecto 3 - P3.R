@@ -13,7 +13,7 @@ library(corrplot)
           "GMEXICOB.MX","TLEVISACPO.MX","KIMBERA.MX",
           "GCARSOA1.MX","GAPB.MX","PE&OLES.MX","LABB.MX")
   
-getSymbols(cartera,src = "yahoo",from="2019-01-01",to="2022-09-01")
+getSymbols(cartera,src = "yahoo",from="2019-01-01",to="2022-09-30")
 
 
 #######################

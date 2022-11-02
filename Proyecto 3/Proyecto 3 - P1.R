@@ -21,7 +21,7 @@ library(knitr) #for kable()
 #          "GCARSOA1.MX","GAPB.MX","PE&OLES.MX"."LABB.MX")
 
   cartera = c("GFNORTEO.MX")
-  getSymbols(cartera,src = "yahoo",from="2019-01-01",to="2022-09-01")
+  getSymbols(cartera,src = "yahoo",from="2019-01-01",to="2022-09-30")
   
 
 #######################
@@ -33,11 +33,13 @@ library(knitr) #for kable()
 
 #######################
 # Rendimientos
-  rendimientos<-diff(precios)/precios
-  rendimientos<-rendimientos[c(-1),]
-  colnames(rendimientos)<-"Rendimiento"
-  head(rendimientos,5)
-
+  
+  rendimientos<-vector()
+  for( i in 1:length(precios$`Precios de cierre`)-1){
+  
+  rendimientos[i]<-(as.numeric(precios[i+1])-as.numeric(precios[i]))/as.numeric(precios[i])
+    
+  }
 
 #######################
 # Ultimo precio
@@ -48,14 +50,14 @@ library(knitr) #for kable()
 #######################
 # Revaluación
   revaluacion<-ultimo_precio*(1+rendimientos)
-  colnames(revaluacion)<-"Revaluacion"
-  head(revaluacion,5)
+  #colnames(revaluacion)<-"Revaluacion"
+  #head(revaluacion,5)
   
 #######################
 # P&L
   PL<-ultimo_precio-revaluacion
-  colnames(PL)<-"PL"
-  head(PL,5)
+  #colnames(PL)<-"PL"
+  #head(PL,5)
 
     
 # //////////////////////////////////////////////////////////////////////////////////  
