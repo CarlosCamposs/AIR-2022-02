@@ -64,7 +64,12 @@ tabla_precios<-as.data.frame(tabla_precios)
   ultimo_precio<-tabla_precios[c(length(tabla_precios$WALMEX.MX.Close)),]
   ultimo_precio<-as.data.frame(ultimo_precio)
 
-
+  # Exportar Tabla_Alisado
+  #  library(openxlsx)
+  #  mydata <- write.xlsx(ultimo_precio,".xlsx")
+  #  saveWorkbook(mydata, file = "C:/Users/Carlos Campos/Desktop/GitHub/AIR-2022-02/Proyecto 3/ultimo_precio.xlsx", overwrite = TRUE)
+  
+  
 #######################
 # Hallamos las medias y sd de los rendimientos de cada activo
   rendimiento_esperado<-colMeans(tabla_rendimientos) 
@@ -77,7 +82,7 @@ tabla_precios<-as.data.frame(tabla_precios)
   
 #######################
 # Numero de acciones de cada emisora
-  no_acciones<-c(1000,1000,500,700,2000,2000,500,100,150,1000)
+  no_acciones<-c(450,2000,300,450,1400,1200,450,150,200,2500)
 
   
 #######################
