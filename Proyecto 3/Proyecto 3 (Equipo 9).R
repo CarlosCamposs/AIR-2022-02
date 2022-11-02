@@ -21,7 +21,7 @@ library(knitr) #for kable()
 #          "GCARSOA1.MX","GAPB.MX","PE&OLES.MX"."LABB.MX")
 
   cartera = c("GFNORTEO.MX")
-  getSymbols(cartera,src = "yahoo",from="2018-01-01",to="2022-09-01")
+  getSymbols(cartera,src = "yahoo",from="2019-01-01",to="2022-09-01")
   
 
 #######################
