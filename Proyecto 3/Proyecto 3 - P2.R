@@ -9,28 +9,32 @@ library(knitr) #for kable()
 
 #######################
 # Cargamos los datos
-cartera = c("MSFT","TSLA","AMZN","AAPL","NVDA","BAC","WALMEX.MX","NFLX","BIMBOA.MX","ELEKTRA.MX")
-getSymbols(cartera,src = "yahoo",from="2018-01-01",to="2022-09-01")
+ cartera=c("WALMEX.MX","AMXL.MX","GFNORTEO.MX",
+          "GMEXICOB.MX","TLEVISACPO.MX","KIMBERA.MX",
+          "GCARSOA1.MX","GAPB.MX","PE&OLES.MX","LABB.MX")
+
+  getSymbols(cartera,src = "yahoo",from="2019-01-01",to="2022-09-01")
 
 
 #######################
 # Obtenemos los precios de cierre de las emisoras
 
-precios1<-MSFT$MSFT.Close
-precios2<-TSLA$TSLA.Close
-precios3<-AMZN$AMZN.Close
-precios4<-AAPL$AAPL.Close
-# Hacemos el codigo solo para cuatro acciones
+precios1<-WALMEX.MX$WALMEX.MX.Close
+precios2<-AMXL.MX$AMXL.MX.Close
+precios3<-GFNORTEO.MX$GFNORTEO.MX.Close
+precios4<-GMEXICOB.MX$GMEXICOB.MX.Close
+precios5<-TLEVISACPO.MX$TLEVISACPO.MX.Close
+precios6<-KIMBERA.MX$KIMBERA.MX.Close
+precios7<-GCARSOA1.MX$GCARSOA1.MX.Close
+precios8<-GAPB.MX$GAPB.MX.Close
+precios9<-`PE&OLES.MX`$`PE&OLES.MX.Close`
+precios10<-LABB.MX$LABB.MX.Close
 
-precios5<-NVDA$NVDA.Close
-precios6<-BAC$BAC.Close
-precios7<-WALMEX.MX$WALMEX.MX.Close
-precios8<-NFLX$NFLX.Close
-precios9<-BIMBOA.MX$BIMBOA.MX.Close
-precios10<-ELEKTRA.MX$ELEKTRA.MX.Close
 
 # Unimos todos los precios de cierre en una tabla
-  tabla_precios<-cbind(precios1,precios2,precios3,precios4)
+  tabla_precios<-cbind(precios1,precios2,precios3,precios4,
+                       precios5,precios6,precios7,precios8,
+                       precios9,precios10)
 
 # Declaramos como dataframe a la tabla recien creada
   tabla_precios<-as.data.frame(tabla_precios)
@@ -40,23 +44,26 @@ precios10<-ELEKTRA.MX$ELEKTRA.MX.Close
 # Rendimientos - Portafolio
   
 tabla_rendimientos<-data.frame()
-  for(i in 1:4){
+  for(i in 1:10){
 
-      for (j in 1:length(tabla_precios$MSFT.Close)){
+      for (j in 1:length(tabla_precios$WALMEX.MX.Close)){
         tabla_rendimientos[j,i]<-tabla_precios[j+1,i]/tabla_precios[j,i]-1
       }  
-  }
+  } 
+  
+# Le quitamos el ultimo renglon porque nos genero un NA en ese renglon
+  tabla_rendimientos<-tabla_rendimientos[c(-length(tabla_rendimientos$V1)),]  
 
 #######################
 # Ultimo precio - Portafolio  
-  ultimo_precio<-tabla_precios[c(length(tabla_precios$MSFT.Close)),]
+  ultimo_precio<-tabla_precios[c(length(tabla_precios$WALMEX.MX.Close)),]
   ultimo_precio<-as.data.frame(ultimo_precio)
 
 #######################
 # Revaluacion - Portafolio
 
 tabla_revaluacion<-data.frame()
-  for(i in 1:4){
+  for(i in 1:10){
   
       for( j in 1:length(tabla_rendimientos$V1)){
         tabla_revaluacion[j,i]<-ultimo_precio[,i]*(1+tabla_rendimientos[j,i])
@@ -64,17 +71,23 @@ tabla_revaluacion<-data.frame()
 
   }
 
+  
+
 #######################
 # P&L individual
 
-  tabla_revaluacion<-tabla_revaluacion[c(-length(tabla_revaluacion$V1)),]
-    #  debe haber 1174
 
   
 PL1<-data.frame()
 PL2<-data.frame()
 PL3<-data.frame()
 PL4<-data.frame()
+PL5<-data.frame()
+PL6<-data.frame()
+PL7<-data.frame()
+PL8<-data.frame()
+PL9<-data.frame()
+PL10<-data.frame()
 
 
   for (j in 1:length(tabla_revaluacion$V1)){
@@ -82,8 +95,15 @@ PL4<-data.frame()
       PL2[j,1]<-ultimo_precio[2]-tabla_revaluacion[j,2]
       PL3[j,1]<-ultimo_precio[3]-tabla_revaluacion[j,3]
       PL4[j,1]<-ultimo_precio[4]-tabla_revaluacion[j,4]
+      PL5[j,1]<-ultimo_precio[5]-tabla_revaluacion[j,5]
+      PL6[j,1]<-ultimo_precio[6]-tabla_revaluacion[j,6]
+      PL7[j,1]<-ultimo_precio[7]-tabla_revaluacion[j,7]
+      PL8[j,1]<-ultimo_precio[8]-tabla_revaluacion[j,8]
+      PL9[j,1]<-ultimo_precio[9]-tabla_revaluacion[j,9]
+      PL10[j,1]<-ultimo_precio[10]-tabla_revaluacion[j,10]
 
-      PL_Portafolio<-cbind(PL1,PL2,PL3,PL4) # Los unimos en una tabla
+      PL_Portafolio<-cbind(PL1,PL2,PL3,PL4,PL5,
+                           PL6,PL7,PL8,PL9,PL10) # Los unimos en una tabla
   }
 
 head(PL_Portafolio,5)
@@ -93,7 +113,7 @@ head(PL_Portafolio,5)
 
 # Creamos una nueva columna en PL_Portafolio donde sea la P&L del portafolio (la suma)
   
-  for(i in 1:length(PL_Portafolio$MSFT.Close)){
+  for(i in 1:length(PL_Portafolio$WALMEX.MX.Close)){
     PL_Portafolio$PL[i]<-rowSums(PL_Portafolio[i,])
   }
 
@@ -115,11 +135,11 @@ VaR_SH1<-quantile(PL_Portafolio$PL,probs = alpha)
 #######################
 #Resultados
 
-VaR_SH<-rbind(VaR_SH1,VaR_SH1*30,VaR_SH1*180,VaR_SH1*360)
-rownames(VaR_SH)<-c("1 dia","30 dias","180 dias", "360 dias")
+  VaR_SH<-rbind(VaR_SH1,VaR_SH1*30,VaR_SH1*180,VaR_SH1*360)
+  rownames(VaR_SH)<-c("1 dia","30 dias","180 dias", "360 dias")
 
-kable(VaR_SH,digits=4,caption = "Método de Simulación Histórica - Portafolio")
-
+  kable(VaR_SH,digits=4,caption = "Método de Simulación Histórica - Portafolio")
+  
 
 # //////////////////////////////////////////////////////////////////////////////////  
 # //////////////////////////////////////////////////////////////////////////////////  
@@ -129,8 +149,10 @@ kable(VaR_SH,digits=4,caption = "Método de Simulación Histórica - Portafolio"
 # Calculamos las medias y sd de cada columna de los rendimientos de cada emisora
 means<-colMeans(tabla_rendimientos) 
 
-sd<-c(sd(tabla_rendimientos$V1),sd(tabla_rendimientos$V2),
-      sd(tabla_rendimientos$V3),sd(tabla_rendimientos$V4))
+sd<-c(sd(tabla_rendimientos$V1),sd(tabla_rendimientos$V2),sd(tabla_rendimientos$V3),
+      sd(tabla_rendimientos$V4),sd(tabla_rendimientos$V5),sd(tabla_rendimientos$V6),
+      sd(tabla_rendimientos$V7),sd(tabla_rendimientos$V8),sd(tabla_rendimientos$V9),
+      sd(tabla_rendimientos$V10))
 
 
 #######################
@@ -139,17 +161,23 @@ sd<-c(sd(tabla_rendimientos$V1),sd(tabla_rendimientos$V2),
   tabla_rendimientos$R2<-rnorm(length(tabla_rendimientos$V1),mean = means[2],sd = sd[2])
   tabla_rendimientos$R3<-rnorm(length(tabla_rendimientos$V1),mean = means[3],sd = sd[3])
   tabla_rendimientos$R4<-rnorm(length(tabla_rendimientos$V1),mean = means[4],sd = sd[4])
-
+  tabla_rendimientos$R5<-rnorm(length(tabla_rendimientos$V1),mean = means[5],sd = sd[5])
+  tabla_rendimientos$R6<-rnorm(length(tabla_rendimientos$V1),mean = means[6],sd = sd[6])
+  tabla_rendimientos$R7<-rnorm(length(tabla_rendimientos$V1),mean = means[7],sd = sd[7])
+  tabla_rendimientos$R8<-rnorm(length(tabla_rendimientos$V1),mean = means[8],sd = sd[8])
+  tabla_rendimientos$R9<-rnorm(length(tabla_rendimientos$V1),mean = means[9],sd = sd[9])
+  tabla_rendimientos$R10<-rnorm(length(tabla_rendimientos$V1),mean = means[10],sd = sd[10])
+  
     
 #######################
 # Revaluacion
   ultimo_precio
 
 tabla_revaluacionSM<-data.frame()
-  for(i in 1:4){
+  for(i in 1:10){
   
       for( j in 1:length(tabla_rendimientos$V1)){
-        tabla_revaluacionSM[j,i]<-ultimo_precio[,i]*(1+tabla_rendimientos[j,i+4])
+        tabla_revaluacionSM[j,i]<-ultimo_precio[,i]*(1+tabla_rendimientos[j,i+10])
       }
   }
 
@@ -160,14 +188,27 @@ tabla_revaluacionSM<-data.frame()
   PL2_SM<-data.frame()
   PL3_SM<-data.frame()
   PL4_SM<-data.frame()
+  PL5_SM<-data.frame()
+  PL6_SM<-data.frame()
+  PL7_SM<-data.frame()
+  PL8_SM<-data.frame()
+  PL9_SM<-data.frame()
+  PL10_SM<-data.frame()
 
   for (j in 1:length(tabla_revaluacionSM$V1)){
     PL1_SM[j,1]<-ultimo_precio[1]-tabla_revaluacionSM[j,1]
     PL2_SM[j,1]<-ultimo_precio[2]-tabla_revaluacionSM[j,2]
     PL3_SM[j,1]<-ultimo_precio[3]-tabla_revaluacionSM[j,3]
     PL4_SM[j,1]<-ultimo_precio[4]-tabla_revaluacionSM[j,4]
+    PL5_SM[j,1]<-ultimo_precio[5]-tabla_revaluacionSM[j,5]
+    PL6_SM[j,1]<-ultimo_precio[6]-tabla_revaluacionSM[j,6]
+    PL7_SM[j,1]<-ultimo_precio[7]-tabla_revaluacionSM[j,7]
+    PL8_SM[j,1]<-ultimo_precio[8]-tabla_revaluacionSM[j,8]
+    PL9_SM[j,1]<-ultimo_precio[9]-tabla_revaluacionSM[j,9]
+    PL10_SM[j,1]<-ultimo_precio[10]-tabla_revaluacionSM[j,10]
   
-    PL_PortafolioSM<-cbind(PL1_SM,PL2_SM,PL3_SM,PL4_SM)
+    PL_PortafolioSM<-cbind(PL1_SM,PL2_SM,PL3_SM,PL4_SM,PL5_SM,
+                           PL6_SM,PL7_SM,PL8_SM,PL9_SM,PL10_SM)
   }
 
 
@@ -176,7 +217,7 @@ tabla_revaluacionSM<-data.frame()
 
 PL_SM<-data.frame()
 
-for(i in 1:length(PL_PortafolioSM$MSFT.Close)){
+for(i in 1:length(PL_PortafolioSM$WALMEX.MX.Close)){
   PL_SM[i,1]<-rowSums(PL_PortafolioSM[i,])
 }
 
@@ -192,11 +233,11 @@ VaR_SM1<-quantile(PL_SM$V1,probs=alpha)
 #######################
 # Resultados
 
-VaR_SM<-rbind(VaR_SM1,VaR_SM1*30,VaR_SM1*180,VaR_SM1*360)
-rownames(VaR_SM)<-c("1 dia","30 dias","180 dias", "360 dias")
+  VaR_SM<-rbind(VaR_SM1,VaR_SM1*30,VaR_SM1*180,VaR_SM1*360)
+  rownames(VaR_SM)<-c("1 dia","30 dias","180 dias", "360 dias")
 
-kable(VaR_SM,digits=4,caption = "Método de Simulación de Montecarlo- Portafolio")
-
+  kable(VaR_SM,digits=4,caption = "Método de Simulación de Montecarlo- Portafolio")
+  
 
 # //////////////////////////////////////////////////////////////////////////////////  
 # //////////////////////////////////////////////////////////////////////////////////  
@@ -209,7 +250,6 @@ head(PL_Portafolio,5)
 VaRB95<-vector()  
 VaRB975<-vector()  
 VaRB99<-vector()  
-
 
 for(i in 1:5000){
   
@@ -232,11 +272,8 @@ for(i in 1:5000){
 # VaR - Portafolio (Bootstrapping - 1 día)
 
 # Sacamos la media
-  VaRBoots95<-mean(VaRB95)
-  VaRBoots975<-mean(VaRB975)
-  VaRBoots99<-mean(VaRB99)
 
-  VaR_B1<-cbind(VaRBoots95,VaRBoots975,VaRBoots99)
+  VaR_B1<-cbind(mean(VaRB95),mean(VaRB975),mean(VaRB99))
   colnames(VaR_B1)<-c("95%","97.5%","99%")
   
 #######################
@@ -246,15 +283,15 @@ for(i in 1:5000){
   rownames(VaR_B)<-c("1 dia","30 dias","180 dias", "360 dias")
 
   kable(VaR_B,digits=4,caption = "Método de Simulación Bootstrapping- Portafolio")
-
+  
 
 # //////////////////////////////////////////////////////////////////////////////////  
 # //////////////////////////////////////////////////////////////////////////////////  
 # Simulacion con Alisado Exponencial - Portafolio
 head(PL_Portafolio,5)
 
-
-PL_AE<-PL_Portafolio$PL 
+# Nos quedamos nada mas con la columna PL
+  PL_AE<-PL_Portafolio$PL 
 
 # Definimos los coeficientes alpha y beta
   a<-0.95
@@ -277,7 +314,6 @@ Alisado<-vector()
   Tabla_Alisado<-cbind(PL_AE,Alisado)
   colnames(Tabla_Alisado)<-c("PL","Alisado")
   head(Tabla_Alisado)
-
 
 # Lo convertimos a dataframe
   Tabla_Alisado<-as.data.frame(Tabla_Alisado)
@@ -336,9 +372,14 @@ head(Tabla_Alisado)
 
 # //////////////////////////////////////////////////////////////////////////////////  
 # //////////////////////////////////////////////////////////////////////////////////  
+# RECOPILACION DE RESULTADOS DEL PORTAFOLIO  
+  
 
-
-
+  kable(VaR_SH,digits=4,caption = "Método de Simulación Histórica - Portafolio")
+  kable(VaR_SM,digits=4,caption = "Método de Simulación de Montecarlo- Portafolio")
+  kable(VaR_B,digits=4,caption = "Método de Simulación Bootstrapping- Portafolio")
+  kable(VaR_AE,digits=4,caption = "Método con Alisado Exponencial- Portafolio")
+  
 
 
 
