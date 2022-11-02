@@ -322,12 +322,17 @@ Alisado<-vector()
 # Lo convertimos a dataframe
   Tabla_Alisado<-as.data.frame(Tabla_Alisado)
 
-  
+
 # Ordenamos tabla de forma descendente basandonos en la columna P&L
   Tabla_Alisado <- Tabla_Alisado[with(Tabla_Alisado, order(-Tabla_Alisado$PL)), ] 
   head(Tabla_Alisado)
 
-
+# Exportar Tabla_Alisado
+#  library(openxlsx)
+#  mydata <- write.xlsx(Tabla_Alisado,".xlsx")
+#  saveWorkbook(mydata, file = "C:/Users/Carlos Campos/Desktop/GitHub/AIR-2022-02/Proyecto 3/Tabla_Alisado.xlsx", overwrite = TRUE)
+  
+  
 # Creamos la columna de Fx
   Alisado2<-Tabla_Alisado$Alisado
   head(Alisado2)
@@ -338,7 +343,7 @@ Fx<-vector()
     Fx[i]<-sum(Alisado2[i:length(Alisado2)])
   }
 
-head(Fx,15)
+head(Fx,30)
 
 # Unimos la columna de Fx con la Tabla_Alisado
 Tabla_Alisado<-cbind(Tabla_Alisado,Fx)
