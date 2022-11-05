@@ -99,23 +99,71 @@ tabla_precios<-as.data.frame(tabla_precios)
 # //////////////////////////////////////////////////////////////////////////////////  
 # VaR parametrico - No diversificado
 
-alpha<-0.95
-F<-qnorm(alpha,mean=0,sd=1)
+
+# Cuantiles
+F95<-qnorm(0.95,mean=0,sd=1)
+F975<-qnorm(0.975,mean=0,sd=1)
+F99<-qnorm(0.99,mean=0,sd=1)
+
+# Tiempo
 tiempo1<-sqrt(1)
 
 # VaR - 1 dia al 95% (por cada acción) 
-  VaR<-F*S*volatilidad_d*tiempo1
-  
-  VaR_NoDiversificado<-sum(VaR)
-  VaR_NoDiversificado # 1 dia al 95%
+  VaR_95<-F95*S*volatilidad_d*tiempo1
+  VaR_NoDiversificado95<-sum(VaR_95)
+  VaR_NoDiversificado95 # 1 dia al 95%
+
+# VaR - 1 dia al 97.5% (por cada acción) 
+  VaR_975<-F975*S*volatilidad_d*tiempo1
+  VaR_NoDiversificado975<-sum(VaR_975)
+  VaR_NoDiversificado975 # 1 dia al 97.5%
+
+# VaR - 1 dia al 99% (por cada acción) 
+  VaR_99<-F99*S*volatilidad_d*tiempo1
+  VaR_NoDiversificado99<-sum(VaR_99)
+  VaR_NoDiversificado99 # 1 dia al 99%
 
   
+# ------------------------------------------------------------------------------
+# Un resumen de los resultados se muestra mas abajo, con un "kable", a continuación
+# se hace el cálculo del VaR No Diversificado del portafolio para diferentes
+# horizontes de tiempo
+  
+# VaR No Diversificado 1 dia con niveles de confianza del 95%, 97.5% y 99%  
+    VaR_NoDiv1<-cbind(VaR_NoDiversificado95,VaR_NoDiversificado975,VaR_NoDiversificado99)  
+    colnames(VaR_NoDiv1)<-c("95%", "97.5%","99%")
+    rownames(VaR_NoDiv1)<-c("1 día")
+
+# VaR No Diversificado 30 dias con niveles de confianza del 95%, 97.5% y 99%  
+    VaR_NoDiv30<-cbind(VaR_NoDiversificado95*sqrt(30),VaR_NoDiversificado975*sqrt(30),VaR_NoDiversificado99*sqrt(30))
+    rownames(VaR_NoDiv30)<-c("30 días")
+
+# VaR No Diversificado 180 dias con niveles de confianza del 95%, 97.5% y 99%  
+    VaR_NoDiv180<-cbind(VaR_NoDiversificado95*sqrt(180),VaR_NoDiversificado975*sqrt(180),VaR_NoDiversificado99*sqrt(180))
+    rownames(VaR_NoDiv180)<-c("180 días")
+
+# VaR No Diversificado 360 dias con niveles de confianza del 95%, 97.5% y 99%  
+    VaR_NoDiv360<-cbind(VaR_NoDiversificado95*sqrt(360),VaR_NoDiversificado975*sqrt(360),VaR_NoDiversificado99*sqrt(360))
+    rownames(VaR_NoDiv360)<-c("360 días")
+# ------------------------------------------------------------------------------  
+    
+    
+
+###################################################################################  
+# Resultados
+
+  VaR_NoDiversificado<-rbind(VaR_NoDiv1,VaR_NoDiv30,VaR_NoDiv180,VaR_NoDiv360)
+  kable(VaR_NoDiversificado,digits=4, caption = "VaR No Diversificado")
+    
+    
 # //////////////////////////////////////////////////////////////////////////////////  
 # //////////////////////////////////////////////////////////////////////////////////  
 # VaR parametrico - Diversificado
 
-alpha<-0.95
-F<-qnorm(alpha,mean=0,sd=1)
+# Cuantiles
+F95<-qnorm(0.95,mean=0,sd=1)
+F975<-qnorm(0.975,mean=0,sd=1)
+F99<-qnorm(0.99,mean=0,sd=1)
 tiempo1<-sqrt(1)
   
 # Creamos la matriz q y la matriz de varianzas y covarianzas
@@ -129,15 +177,52 @@ tiempo1<-sqrt(1)
 # Definimos que sd_diver sea un vector para poder hacer cuentas
     sd_diver<-as.vector(sd_diver)
 
-# Hallamos el VaR diversificado al 95%  
-VaR_Diversificado<-F*sum(S)*sd_diver*tiempo1
+# VaR diversificado al 95%  
+VaR_Diversificado95<-F95*sum(S)*sd_diver*tiempo1
 
+# VaR diversificado al 97.5%  
+VaR_Diversificado975<-F975*sum(S)*sd_diver*tiempo1
+
+# VaR diversificado al 99%  
+VaR_Diversificado99<-F99*sum(S)*sd_diver*tiempo1
+
+
+# ------------------------------------------------------------------------------
+# Un resumen de los resultados se muestra mas abajo, con un "kable", a continuación
+# se hace el cálculo del VaR Diversificado del portafolio para diferentes
+# horizontes de tiempo
+
+# VaR Diversificado 1 dia con niveles de confianza del 95%, 97.5% y 99%  
+VaR_Div1<-cbind(VaR_Diversificado95,VaR_Diversificado975,VaR_Diversificado99)
+colnames(VaR_Div1)<-c("95%", "97.5%","99%")
+rownames(VaR_Div1)<-c("1 día")
+
+# VaR Diversificado 30 dia con niveles de confianza del 95%, 97.5% y 99%  
+VaR_Div30<-cbind(VaR_Diversificado95*sqrt(30),VaR_Diversificado975*sqrt(30),VaR_Diversificado99*sqrt(30))
+rownames(VaR_Div30)<-c("30 días")
+
+# VaR Diversificado 180 dia con niveles de confianza del 95%, 97.5% y 99%  
+VaR_Div180<-cbind(VaR_Diversificado95*sqrt(180),VaR_Diversificado975*sqrt(180),VaR_Diversificado99*sqrt(180))
+rownames(VaR_Div180)<-c("180 días")
+
+# VaR Diversificado 360 dia con niveles de confianza del 95%, 97.5% y 99%  
+VaR_Div360<-cbind(VaR_Diversificado95*sqrt(360),VaR_Diversificado975*sqrt(360),VaR_Diversificado99*sqrt(360))
+rownames(VaR_Div360)<-c("360 días")
+# ------------------------------------------------------------------------------  
+
+###################################################################################  
+# Resultados
+
+  VaR_Diversificado<-rbind(VaR_Div1,VaR_Div30,VaR_Div180,VaR_Div360)
+  kable(VaR_Diversificado,digits=4, caption = "VaR No Diversificado")
+
+  
 # //////////////////////////////////////////////////////////////////////////////////  
 # //////////////////////////////////////////////////////////////////////////////////  
 # RESULTADOS
 
-VaR_Diversificado
-VaR_NoDiversificado
+  kable(VaR_NoDiversificado,digits=4, caption = "VaR No Diversificado")
+  kable(VaR_Diversificado,digits=4, caption = "VaR Diversificado")
 
 
 

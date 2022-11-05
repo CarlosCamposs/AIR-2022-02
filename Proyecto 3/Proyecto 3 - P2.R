@@ -75,43 +75,29 @@ tabla_revaluacion<-data.frame()
 
 #######################
 # P&L individual
+# Creamos la funcion P&L de cada emisora y las juntamos en un dataframe llamado PL_Portafolio
 
 
+PL_Portafolio<-data.frame()  
+
+ultimo_precio
   
-PL1<-data.frame()
-PL2<-data.frame()
-PL3<-data.frame()
-PL4<-data.frame()
-PL5<-data.frame()
-PL6<-data.frame()
-PL7<-data.frame()
-PL8<-data.frame()
-PL9<-data.frame()
-PL10<-data.frame()
+  for (i in 1:length(tabla_revaluacion)){
+      
+      for (j in 1:length(tabla_revaluacion$V1)){
+        PL_Portafolio[j,i]<-ultimo_precio[i]-tabla_revaluacion[j,i]
+                
+      }
 
+  }  
 
-  for (j in 1:length(tabla_revaluacion$V1)){
-      PL1[j,1]<-ultimo_precio[1]-tabla_revaluacion[j,1]
-      PL2[j,1]<-ultimo_precio[2]-tabla_revaluacion[j,2]
-      PL3[j,1]<-ultimo_precio[3]-tabla_revaluacion[j,3]
-      PL4[j,1]<-ultimo_precio[4]-tabla_revaluacion[j,4]
-      PL5[j,1]<-ultimo_precio[5]-tabla_revaluacion[j,5]
-      PL6[j,1]<-ultimo_precio[6]-tabla_revaluacion[j,6]
-      PL7[j,1]<-ultimo_precio[7]-tabla_revaluacion[j,7]
-      PL8[j,1]<-ultimo_precio[8]-tabla_revaluacion[j,8]
-      PL9[j,1]<-ultimo_precio[9]-tabla_revaluacion[j,9]
-      PL10[j,1]<-ultimo_precio[10]-tabla_revaluacion[j,10]
-
-      PL_Portafolio<-cbind(PL1,PL2,PL3,PL4,PL5,
-                           PL6,PL7,PL8,PL9,PL10) # Los unimos en una tabla
-  }
-
-head(PL_Portafolio,5)
-
+head(PL_Portafolio,5)  
+  
+  
 #######################
 # P&L - Portafolio
 
-# Creamos una nueva columna en PL_Portafolio donde sea la P&L del portafolio (la suma)
+# Creamos una nueva columna en PL_Portafolio donde sea la P&L del portafolio (es la suma de las P&L de cada emisora)
 
 PL_Port<-data.frame()
   for(i in 1:length(PL_Portafolio$WALMEX.MX.Close)){
@@ -162,78 +148,84 @@ sd<-c(sd(tabla_rendimientos$V1),sd(tabla_rendimientos$V2),sd(tabla_rendimientos$
 
 #######################
 # Simulacion de rendimientos (normal)
-  tabla_rendimientos$R1<-rnorm(length(tabla_rendimientos$V1),mean = means[1],sd = sd[1])
-  tabla_rendimientos$R2<-rnorm(length(tabla_rendimientos$V1),mean = means[2],sd = sd[2])
-  tabla_rendimientos$R3<-rnorm(length(tabla_rendimientos$V1),mean = means[3],sd = sd[3])
-  tabla_rendimientos$R4<-rnorm(length(tabla_rendimientos$V1),mean = means[4],sd = sd[4])
-  tabla_rendimientos$R5<-rnorm(length(tabla_rendimientos$V1),mean = means[5],sd = sd[5])
-  tabla_rendimientos$R6<-rnorm(length(tabla_rendimientos$V1),mean = means[6],sd = sd[6])
-  tabla_rendimientos$R7<-rnorm(length(tabla_rendimientos$V1),mean = means[7],sd = sd[7])
-  tabla_rendimientos$R8<-rnorm(length(tabla_rendimientos$V1),mean = means[8],sd = sd[8])
-  tabla_rendimientos$R9<-rnorm(length(tabla_rendimientos$V1),mean = means[9],sd = sd[9])
-  tabla_rendimientos$R10<-rnorm(length(tabla_rendimientos$V1),mean = means[10],sd = sd[10])
-  
-    
-#######################
-# Revaluacion
-  ultimo_precio
 
-tabla_revaluacionSM<-data.frame()
+# Definimos los vectores donde se guardaran los valores del VaR en cada simulacion que hagamos
+VaRSM95<-vector()  
+VaRSM975<-vector()  
+VaRSM99<-vector() 
+
   for(i in 1:10){
   
-      for( j in 1:length(tabla_rendimientos$V1)){
-        tabla_revaluacionSM[j,i]<-ultimo_precio[,i]*(1+tabla_rendimientos[j,i+10])
-      }
-  }
+        # Creamos las simulaciones de los rendimientos de cada emisora en nuevas columnas Ri
+        tabla_rendimientos$R1<-rnorm(length(tabla_rendimientos$V1),mean = means[1],sd = sd[1])
+        tabla_rendimientos$R2<-rnorm(length(tabla_rendimientos$V1),mean = means[2],sd = sd[2])
+        tabla_rendimientos$R3<-rnorm(length(tabla_rendimientos$V1),mean = means[3],sd = sd[3])
+        tabla_rendimientos$R4<-rnorm(length(tabla_rendimientos$V1),mean = means[4],sd = sd[4])
+        tabla_rendimientos$R5<-rnorm(length(tabla_rendimientos$V1),mean = means[5],sd = sd[5])
+        tabla_rendimientos$R6<-rnorm(length(tabla_rendimientos$V1),mean = means[6],sd = sd[6])
+        tabla_rendimientos$R7<-rnorm(length(tabla_rendimientos$V1),mean = means[7],sd = sd[7])
+        tabla_rendimientos$R8<-rnorm(length(tabla_rendimientos$V1),mean = means[8],sd = sd[8])
+        tabla_rendimientos$R9<-rnorm(length(tabla_rendimientos$V1),mean = means[9],sd = sd[9])
+        tabla_rendimientos$R10<-rnorm(length(tabla_rendimientos$V1),mean = means[10],sd = sd[10])
 
+        #######################
+        # Revaluacion
+        # Una vez obtenido los rendimientos simulados, procedemos a calcular la revaluacion para cada emisora
 
-#######################
-# P&L indivual
-  PL1_SM<-data.frame()
-  PL2_SM<-data.frame()
-  PL3_SM<-data.frame()
-  PL4_SM<-data.frame()
-  PL5_SM<-data.frame()
-  PL6_SM<-data.frame()
-  PL7_SM<-data.frame()
-  PL8_SM<-data.frame()
-  PL9_SM<-data.frame()
-  PL10_SM<-data.frame()
+        tabla_revaluacionSM<-data.frame()
+        for(k in 1:10){
+    
+          for( j in 1:length(tabla_rendimientos$V1)){
+              tabla_revaluacionSM[j,k]<-ultimo_precio[,k]*(1+tabla_rendimientos[j,k+10])
+            }
+        
+        }
 
-  for (j in 1:length(tabla_revaluacionSM$V1)){
-    PL1_SM[j,1]<-ultimo_precio[1]-tabla_revaluacionSM[j,1]
-    PL2_SM[j,1]<-ultimo_precio[2]-tabla_revaluacionSM[j,2]
-    PL3_SM[j,1]<-ultimo_precio[3]-tabla_revaluacionSM[j,3]
-    PL4_SM[j,1]<-ultimo_precio[4]-tabla_revaluacionSM[j,4]
-    PL5_SM[j,1]<-ultimo_precio[5]-tabla_revaluacionSM[j,5]
-    PL6_SM[j,1]<-ultimo_precio[6]-tabla_revaluacionSM[j,6]
-    PL7_SM[j,1]<-ultimo_precio[7]-tabla_revaluacionSM[j,7]
-    PL8_SM[j,1]<-ultimo_precio[8]-tabla_revaluacionSM[j,8]
-    PL9_SM[j,1]<-ultimo_precio[9]-tabla_revaluacionSM[j,9]
-    PL10_SM[j,1]<-ultimo_precio[10]-tabla_revaluacionSM[j,10]
+        #######################
+        # P&L indivual
+        # Construimos la P&L de cada emisora
+        PL_PortafolioSM<-data.frame()
   
-    PL_PortafolioSM<-cbind(PL1_SM,PL2_SM,PL3_SM,PL4_SM,PL5_SM,
-                           PL6_SM,PL7_SM,PL8_SM,PL9_SM,PL10_SM)
-  }
-
-
-#######################
-# P&L del Portafolio
-
-PL_SM<-data.frame()
-
-for(i in 1:length(PL_PortafolioSM$WALMEX.MX.Close)){
-  PL_SM[i,1]<-rowSums(PL_PortafolioSM[i,])
+        for (k in 1:length(tabla_revaluacionSM)){
+    
+          for(j in 1:length(tabla_revaluacionSM$V1)){
+      
+            PL_PortafolioSM[j,k]<-ultimo_precio[k]-tabla_revaluacionSM[j,k]
+          }
+        }
+  
+        #######################
+        # P&L del Portafolio
+        
+        PL_SM<-data.frame()
+        
+        for(k in 1:length(PL_PortafolioSM$WALMEX.MX.Close)){
+          PL_SM[k,1]<-rowSums(PL_PortafolioSM[k,])
+        }
+        
+        head(PL_SM,5)
+        
+        #######################
+        # VaR - Portafolio (Simulacion Montecarlo - 1 día)
+        # Para cada tabltia de P&L obtenida, calculamos los VaR y los guardamos en vectores
+        
+        VaRSM95[i]<-quantile(PL_SM$V1,probs=0.95) 
+        VaRSM975[i]<-quantile(PL_SM$V1,probs=0.975)
+        VaRSM99[i]<-quantile(PL_SM$V1,probs=0.99) 
+        
+  
 }
+  # Calculamos el promedio de cada vector
+  VaR_Montecarlo95<-mean(VaRSM95)
+  VaR_Montecarlo975<-mean(VaRSM975)
+  VaR_Montecarlo99<-mean(VaRSM99)
 
-head(PL_SM,5)
-
-
-#######################
-# VaR - Portafolio (Simulacion Montecarlo - 1 día)
-alpha<-c(0.95,0.975,0.99)
-VaR_SM1<-quantile(PL_SM$V1,probs=alpha) 
+  # En el vector VaR_SM1 metemos los valores del VaR por metodo de Montecarlo 1 día
+  VaR_SM1<-cbind(VaR_Montecarlo95,VaR_Montecarlo975,VaR_Montecarlo99)
+  colnames(VaR_SM1)<-c("95%","97.5%","99%")
   
+
+    
 
 #######################
 # Resultados
