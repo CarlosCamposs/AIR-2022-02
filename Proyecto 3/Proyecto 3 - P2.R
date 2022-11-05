@@ -154,19 +154,19 @@ VaRSM95<-vector()
 VaRSM975<-vector()  
 VaRSM99<-vector() 
 
-  for(i in 1:10){
+
+  for(i in 1:5000){
+
+rendimientos_sim<-data.frame()
   
-        # Creamos las simulaciones de los rendimientos de cada emisora en nuevas columnas Ri
-        tabla_rendimientos$R1<-rnorm(length(tabla_rendimientos$V1),mean = means[1],sd = sd[1])
-        tabla_rendimientos$R2<-rnorm(length(tabla_rendimientos$V1),mean = means[2],sd = sd[2])
-        tabla_rendimientos$R3<-rnorm(length(tabla_rendimientos$V1),mean = means[3],sd = sd[3])
-        tabla_rendimientos$R4<-rnorm(length(tabla_rendimientos$V1),mean = means[4],sd = sd[4])
-        tabla_rendimientos$R5<-rnorm(length(tabla_rendimientos$V1),mean = means[5],sd = sd[5])
-        tabla_rendimientos$R6<-rnorm(length(tabla_rendimientos$V1),mean = means[6],sd = sd[6])
-        tabla_rendimientos$R7<-rnorm(length(tabla_rendimientos$V1),mean = means[7],sd = sd[7])
-        tabla_rendimientos$R8<-rnorm(length(tabla_rendimientos$V1),mean = means[8],sd = sd[8])
-        tabla_rendimientos$R9<-rnorm(length(tabla_rendimientos$V1),mean = means[9],sd = sd[9])
-        tabla_rendimientos$R10<-rnorm(length(tabla_rendimientos$V1),mean = means[10],sd = sd[10])
+  for(k in 1:10){
+    for(j in 1:length(tabla_rendimientos$V1)){
+      rendimientos_sim[j,k]<-rnorm(length(tabla_rendimientos$V1),mean = means[k],sd = sd[k])[j]
+    }
+      
+  } 
+    
+    
 
         #######################
         # Revaluacion
@@ -175,8 +175,8 @@ VaRSM99<-vector()
         tabla_revaluacionSM<-data.frame()
         for(k in 1:10){
     
-          for( j in 1:length(tabla_rendimientos$V1)){
-              tabla_revaluacionSM[j,k]<-ultimo_precio[,k]*(1+tabla_rendimientos[j,k+10])
+          for( j in 1:length(rendimientos_sim$V1)){
+              tabla_revaluacionSM[j,k]<-ultimo_precio[,k]*(1+rendimientos_sim[j,k])
             }
         
         }
