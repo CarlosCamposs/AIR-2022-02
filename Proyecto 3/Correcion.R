@@ -256,5 +256,187 @@ View(VaR_SM360)
 # Metodo de Simulacion Bootstrap
 
 
+VaRBoots95<-data.frame()  
+VaRBoots975<-data.frame()
+VaRBoots99<-data.frame()
+PL_EmisorasBoots<-data.frame()
 
 
+for (i in 1:10){
+  
+  # Hacemos un remuestreo del P&L de cada emisora y lo metemos en un dataframe llamado PL_EmisorasBoots  
+  # el remuestro de cada emisora se mete en una columna del de dataframe "PL_EmisorasBoots"
+  for(k in 1:10){
+      for (j in 1:length(PL_Portafolio$WALMEX.MX.Close)){
+      
+        PL_EmisorasBoots[j,k]<-sample(PL_Portafolio[,k], size=length(PL_Portafolio$WALMEX.MX.Close), replace = TRUE)[j]
+      
+      }
+  }
+  
+  
+  # Calculamos el VaR a diferentes niveles de confianza para cada emisora  
+  
+  for (j in 1:10){
+    VaRBoots95[i,j]<-quantile(PL_EmisorasBoots[,j],0.95)
+    VaRBoots975[i,j]<-quantile(PL_EmisorasBoots[,j],0.975)
+    VaRBoots99[i,j]<-quantile(PL_EmisorasBoots[,j],0.99)
+  }
+
+  
+}
+
+
+# El VaR por simulacion Bootstrap de cada emisora es el promedio de cada columna
+
+# En la primera columna colocamos los VaR de cada emisora al 95%
+# En la segunda columna colocamos los VaR de cada emisora al 97.5%
+# En la tecera columna colocamos los VaR de cada emisora al 99%
+
+VaR_Boots1<-data.frame()
+
+for (j in 1:10){
+  VaR_Boots1[j,1]<- colMeans(VaRBoots95)[j]
+  VaR_Boots1[j,2]<- colMeans(VaRBoots975)[j]
+  VaR_Boots1[j,3]<- colMeans(VaRBoots99)[j]
+  
+}
+colnames(VaR_Boots1)<-c("95%","97.5%","99%")
+rownames(VaR_Boots1)<-cartera 
+
+
+# -------------------------------------------------------------------------------
+# Resultados
+
+# Hacemos la suma por columnas para obtener el VaR No Diversificado - 1 dia
+VaR_Boots1["VaR No Diversificado",]<-colSums(VaR_Boots1)
+View(VaR_Boots1)
+
+
+# Obtenemos el VaR No Diversificado 30 - dias
+VaR_Boots30<-VaR_Boots1*30
+View(VaR_Boots30)
+
+# Obtenemos el VaR No Diversificado 180 - dias
+VaR_Boots180<-VaR_Boots1*180
+View(VaR_Boots180)
+
+# Obtenemos el VaR No Diversificado 360 - dias
+VaR_Boots360<-VaR_Boots1*360
+View(VaR_Boots360)
+# -------------------------------------------------------------------------------
+
+############################################################################################
+# Simulacion con Alisado Exponencial
+
+View(PL_Portafolio)
+
+
+
+# Definimos los coeficientes alpha y beta
+  a<-0.95
+  b<-0.05
+
+  
+# Creamos la función de Alisado Exponencial de abajo hacia arriba
+  
+  limite<-length(PL_Portafolio$WALMEX.MX.Close)-1 # Indicador
+  Alisado<-vector()
+  
+  for(k in 0:limite){
+    
+    Alisado[length(PL_Portafolio$WALMEX.MX.Close)-k]<-a^(k)*b
+    
+  }
+
+  
+# Unimos en una tabla la P&L y el Alisado
+  Tabla_Alisado<-cbind(PL_Portafolio,Alisado)
+  colnames(Tabla_Alisado)<-c(cartera,"Alisado")
+  head(Tabla_Alisado)
+  
+  # Exportar Tabla_Alisado
+  #  library(openxlsx)
+  #  mydata <- write.xlsx(Tabla_Alisado,".xlsx")
+  #  saveWorkbook(mydata, file = "C:/Users/Carlos Campos/Desktop/GitHub/AIR-2022-02/Proyecto 3/Tabla_Alisado.xlsx", overwrite = TRUE)
+  
+
+# Creamos una tabla para cada emisora donde se ordenen los valores de su P&L
+
+# ---------------------------------------------------------------------------------
+  # WALMEX
+  Tabla_Alisado1<-Tabla_Alisado[,c(1,11)]
+  Tabla_Alisado1 <- Tabla_Alisado1[with(Tabla_Alisado1, order(-Tabla_Alisado1$WALMEX.MX)), ] 
+  
+  # Creamos la columna de Fx
+  Alisado1<-Tabla_Alisado1$Alisado
+  
+  Fx<-vector()
+  
+  for(i in 1:length(Alisado1)){
+    Fx[i]<-sum(Alisado1[i:length(Alisado1)])
+  }
+  
+  head(Fx,30)
+  
+# Unimos la columna de Fx con la Tabla_Alisado
+  Tabla_Alisado1<-cbind(Tabla_Alisado1,Fx)
+
+  # VaR al 95% (1 día)
+  tabla_emisora1_95<-Tabla_Alisado1[which(Tabla_Alisado1$Fx>=0.95),] # Guarda todos los valores mayores a 0.95
+  VaRAE_95EMISORA1<-tabla_emisora1_95[length(tabla_emisora1_95$Fx),1] # Se toma el primer valor que sea mayor a 0.95
+  
+  # VaR al 975% (1 día)
+  tabla_emisora1_975<-Tabla_Alisado1[which(Tabla_Alisado1$Fx>=0.975),]
+  VaRAE_975EMISORA1<-tabla_emisora1_975[length(tabla_emisora1_975$Fx),1]
+  
+  
+  # VaR al 99% (1 día)
+  tabla_emisora1_99<-Tabla_Alisado1[which(Tabla_Alisado1$Fx>=0.99),]
+  VaRAE_99EMISORA1<-tabla_emisora1_99[length(tabla_emisora1_99$Fx),1]
+  
+# Resultados - VaR 1 dia de WalMex  
+  VaRAE_emisora1<-cbind(VaRAE_95EMISORA1,VaRAE_975EMISORA1,VaRAE_99EMISORA1) 
+  colnames(VaRAE_emisora1) <-c("95%","97.5%","99%")  
+  VaRAE_emisora1
+  
+# ---------------------------------------------------------------------------------  
+  
+# ---------------------------------------------------------------------------------
+  # AMXL
+  Tabla_Alisado2<-Tabla_Alisado[,c(2,11)]
+  Tabla_Alisado2 <- Tabla_Alisado2[with(Tabla_Alisado2, order(-Tabla_Alisado2$AMXL.MX)), ] 
+  
+  # Creamos la columna de Fx
+  Alisado2<-Tabla_Alisado2$Alisado
+  
+  Fx<-vector()
+  
+  for(i in 1:length(Alisado2)){
+    Fx[i]<-sum(Alisado2[i:length(Alisado2)])
+  }
+  
+  head(Fx,30)
+  
+  # Unimos la columna de Fx con la Tabla_Alisado
+  Tabla_Alisado2<-cbind(Tabla_Alisado2,Fx)
+  
+  # VaR al 95% (1 día)
+  tabla_emisora2_95<-Tabla_Alisado2[which(Tabla_Alisado2$Fx>=0.95),] # Guarda todos los valores mayores a 0.95
+  VaRAE_95EMISORA2<-tabla_emisora2_95[length(tabla_emisora2_95$Fx),1] # Se toma el primer valor que sea mayor a 0.95
+  
+  # VaR al 975% (1 día)
+  tabla_emisora2_975<-Tabla_Alisado2[which(Tabla_Alisado2$Fx>=0.975),]
+  VaRAE_975EMISORA2<-tabla_emisora2_975[length(tabla_emisora2_975$Fx),1]
+  
+  
+  # VaR al 99% (1 día)
+  tabla_emisora2_99<-Tabla_Alisado2[which(Tabla_Alisado2$Fx>=0.99),]
+  VaRAE_99EMISORA2<-tabla_emisora2_99[length(tabla_emisora2_99$Fx),1]
+  
+  # Resultados - VaR 1 dia de WalMex  
+  VaRAE_emisora2<-cbind(VaRAE_95EMISORA2,VaRAE_975EMISORA2,VaRAE_99EMISORA2) 
+  colnames(VaRAE_emisora2) <-c("95%","97.5%","99%")  
+  VaRAE_emisora2
+  
+# ---------------------------------------------------------------------------------    
