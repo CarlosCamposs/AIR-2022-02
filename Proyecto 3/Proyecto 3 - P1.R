@@ -20,13 +20,13 @@ library(knitr) #for kable()
 #          "GMEXICOB.MX","TLEVISACPO.MX","KIMBERA.MX",
 #          "GCARSOA1.MX","GAPB.MX","PE&OLES.MX"."LABB.MX")
 
-  cartera = c("GFNORTEO.MX")
+  cartera = c("WALMEX.MX")
   getSymbols(cartera,src = "yahoo",from="2019-01-01",to="2022-09-30")
   
 
 #######################
 # Precios de cierre
-  precios<-GFNORTEO.MX$GFNORTEO.MX.Close
+  precios<-WALMEX.MX$WALMEX.MX.Close
   colnames(precios)<-c("Precios de cierre")
   head(precios,5)
 
