@@ -1,10 +1,10 @@
 # Administracion Integral de Riesgos
-# Proyecto 3 - Parte 2
+# Proyecto 3 (Equipo 9) - VaR diversificado
 
 library(TTR)
 library(tidyquant)
 library(quantmod)
-library(knitr) #for kable()
+library(knitr)
 
 
 #######################
@@ -129,7 +129,7 @@ VaR_SH1<-quantile(PL_Portafolio$PL,probs = alpha)
   VaR_SH<-rbind(VaR_SH1,VaR_SH1*30,VaR_SH1*180,VaR_SH1*360)
   rownames(VaR_SH)<-c("1 dia","30 dias","180 dias", "360 dias")
 
-  kable(VaR_SH,digits=4,caption = "Método de Simulación Histórica - Portafolio")
+  kable(VaR_SH,digits=4,caption = "Método de Simulación Histórica - VaR diversificado")
   
 
 # //////////////////////////////////////////////////////////////////////////////////  
@@ -154,9 +154,12 @@ VaRSM95<-vector()
 VaRSM975<-vector()  
 VaRSM99<-vector() 
 
+# Este "for" corresponde al numero de simulaciones, al dejar 5000 simulaciones el proceso lleva bastante tiempo
+# los resultados que se muestran en el documento corresponden a realizar 5000 simulaciones pero en el script hemos
+# decidido dejar solamente una simulacio a fin de que se puedan visualizar los resultados
 
-  for(i in 1:5000){
-
+  for(i in 1:1){ 
+    
 rendimientos_sim<-data.frame()
   
   for(k in 1:10){
@@ -233,7 +236,7 @@ rendimientos_sim<-data.frame()
   VaR_SM<-rbind(VaR_SM1,VaR_SM1*30,VaR_SM1*180,VaR_SM1*360)
   rownames(VaR_SM)<-c("1 dia","30 dias","180 dias", "360 dias")
 
-  kable(VaR_SM,digits=4,caption = "Método de Simulación de Montecarlo- Portafolio")
+  kable(VaR_SM,digits=4,caption = "Método de Simulación de Montecarlo- VaR diversificado")
   
 
 # //////////////////////////////////////////////////////////////////////////////////  
@@ -368,7 +371,7 @@ head(Tabla_Alisado)
   VaR_AE<-rbind(VaR_AE1,VaR_AE1*30,VaR_AE1*180,VaR_AE1*360)
   rownames(VaR_AE)<-c("1 dia","30 dias","180 dias", "360 dias")
 
-  kable(VaR_AE,digits=4,caption = "Método con Alisado Exponencial- Portafolio")
+  kable(VaR_AE,digits=4,caption = "Método con Alisado Exponencial- VaR diversificado")
 
 
 # //////////////////////////////////////////////////////////////////////////////////  
@@ -376,10 +379,10 @@ head(Tabla_Alisado)
 # RECOPILACION DE RESULTADOS DEL PORTAFOLIO  
   
   
-  kable(VaR_SH,digits=4,caption = "Método de Simulación Histórica - Portafolio")
-  kable(VaR_SM,digits=4,caption = "Método de Simulación de Montecarlo- Portafolio")
-  kable(VaR_B,digits=4,caption = "Método de Simulación Bootstrapping- Portafolio")
-  kable(VaR_AE,digits=4,caption = "Método con Alisado Exponencial- Portafolio")
+  kable(VaR_SH,digits=4,caption = "Método de Simulación Histórica - VaR diversificado")
+  kable(VaR_SM,digits=4,caption = "Método de Simulación de Montecarlo- VaR diversificado")
+  kable(VaR_B,digits=4,caption = "Método de Simulación Bootstrapping- VaR diversificado")
+  kable(VaR_AE,digits=4,caption = "Método con Alisado Exponencial- VaR diversificado")
   
 
 

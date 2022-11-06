@@ -1,10 +1,10 @@
 # Administracion Integral de Riesgos
-# Proyecto 3 - Parte 2
+# Proyecto 3 (Equipo 9) - VaR no diversificado
 
 library(TTR)
 library(tidyquant)
 library(quantmod)
-library(knitr) #for kable()
+library(knitr)
 library (dplyr)
 
 
@@ -155,7 +155,7 @@ VaRSM95<-data.frame()
 VaRSM975<-data.frame()
 VaRSM99<-data.frame()
 
-for(i in 1:1000){ # Este "for" corresponde al numero de simulaciones, tarda mucho tiempo, se puede correr una sola simulacion para ver los resultados rapidos
+for(i in 1:1){ # Este "for" corresponde al numero de simulaciones, tarda mucho tiempo, se puede correr una sola simulacion para ver los resultados rapidos
   
     rendimientos_sim<-data.frame()
   
@@ -262,7 +262,7 @@ VaRBoots99<-data.frame()
 PL_EmisorasBoots<-data.frame()
 
 
-for (i in 1:5000){ # Este "for" es para las simulaciones, se tarda mucho tiempo. Se puede establecer que haga una simulacion para ver los resultados rapidos
+for (i in 1:1){ # Este "for" es para las simulaciones, se tarda mucho tiempo. Se puede establecer que haga una simulacion para ver los resultados rapidos
   
   # Hacemos un remuestreo del P&L de cada emisora y lo metemos en un dataframe llamado PL_EmisorasBoots  
   # el remuestro de cada emisora se mete en una columna del de dataframe "PL_EmisorasBoots"
