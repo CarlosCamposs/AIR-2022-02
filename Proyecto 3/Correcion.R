@@ -155,57 +155,57 @@ VaRSM95<-data.frame()
 VaRSM975<-data.frame()
 VaRSM99<-data.frame()
 
-for(i in 1:10){
+for(i in 1:1000){ # Este "for" corresponde al numero de simulaciones, tarda mucho tiempo, se puede correr una sola simulacion para ver los resultados rapidos
   
-  rendimientos_sim<-data.frame()
+    rendimientos_sim<-data.frame()
   
-  for(k in 1:10){
-    for(j in 1:length(tabla_rendimientos$V1)){
-      rendimientos_sim[j,k]<-rnorm(length(tabla_rendimientos$V1),mean = means[k],sd = sd[k])[j]
+    for(k in 1:10){
+      for(j in 1:length(tabla_rendimientos$V1)){
+        rendimientos_sim[j,k]<-rnorm(length(tabla_rendimientos$V1),mean = means[k],sd = sd[k])[j]
+      }
+    
+    } 
+  
+  
+  
+    #######################
+    # Revaluacion
+    # Una vez obtenido los rendimientos simulados, procedemos a calcular la revaluacion para cada emisora
+  
+    tabla_revaluacionSM<-data.frame()
+    for(k in 1:10){
+    
+      for( j in 1:length(rendimientos_sim$V1)){
+        tabla_revaluacionSM[j,k]<-ultimo_precio[,k]*(1+rendimientos_sim[j,k])
+      }
+    
     }
+  
+    #######################
+    # P&L indivual
+    # Construimos la P&L de cada emisora
+    PL_EmisorasSM<-data.frame()
+  
+    for (k in 1:length(tabla_revaluacionSM)){
     
-  } 
-  
-  
-  
-  #######################
-  # Revaluacion
-  # Una vez obtenido los rendimientos simulados, procedemos a calcular la revaluacion para cada emisora
-  
-  tabla_revaluacionSM<-data.frame()
-  for(k in 1:10){
-    
-    for( j in 1:length(rendimientos_sim$V1)){
-      tabla_revaluacionSM[j,k]<-ultimo_precio[,k]*(1+rendimientos_sim[j,k])
-    }
-    
-  }
-  
-  #######################
-  # P&L indivual
-  # Construimos la P&L de cada emisora
-  PL_EmisorasSM<-data.frame()
-  
-  for (k in 1:length(tabla_revaluacionSM)){
-    
-    for(j in 1:length(tabla_revaluacionSM$V1)){
+      for(j in 1:length(tabla_revaluacionSM$V1)){
       
-      PL_EmisorasSM[j,k]<-ultimo_precio[k]-tabla_revaluacionSM[j,k]
+        PL_EmisorasSM[j,k]<-ultimo_precio[k]-tabla_revaluacionSM[j,k]
+      }
     }
-  }
 
 
-#######################
-# VaR - Portafolio (Simulacion Montecarlo - 1 día)
-# Para cada emisora, calculamos el VaR y los guardamos en un dataframe, de modo que
-# tendremos 10 valores de VaR al 95% de confianza y se guardan todos en una fila
-# del dataframe VARSM95 (para los otros dos es analogo)
+    #######################
+    # VaR - Portafolio (Simulacion Montecarlo - 1 día)
+    # Para cada emisora, calculamos el VaR y los guardamos en un dataframe, de modo que
+    # tendremos 10 valores de VaR al 95% de confianza y se guardan todos en una fila
+    # del dataframe VARSM95 (para los otros dos es analogo)
   
-  for(j in 1:10){
-    VaRSM95[i,j]<-quantile(PL_EmisorasSM[,j],probs=0.95) 
-    VaRSM975[i,j]<-quantile(PL_EmisorasSM[,j],probs=0.975)
-    VaRSM99[i,j]<-quantile(PL_EmisorasSM[,j],probs=0.99) 
-  }
+    for(j in 1:10){
+      VaRSM95[i,j]<-quantile(PL_EmisorasSM[,j],probs=0.95) 
+      VaRSM975[i,j]<-quantile(PL_EmisorasSM[,j],probs=0.975)
+      VaRSM99[i,j]<-quantile(PL_EmisorasSM[,j],probs=0.99) 
+    }
   
 }
 
@@ -262,7 +262,7 @@ VaRBoots99<-data.frame()
 PL_EmisorasBoots<-data.frame()
 
 
-for (i in 1:10){
+for (i in 1:5000){ # Este "for" es para las simulaciones, se tarda mucho tiempo. Se puede establecer que haga una simulacion para ver los resultados rapidos
   
   # Hacemos un remuestreo del P&L de cada emisora y lo metemos en un dataframe llamado PL_EmisorasBoots  
   # el remuestro de cada emisora se mete en una columna del de dataframe "PL_EmisorasBoots"

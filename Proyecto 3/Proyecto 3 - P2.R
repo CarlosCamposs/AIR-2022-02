@@ -279,7 +279,7 @@ for(i in 1:5000){
   VaR_B<-rbind(VaR_B1,VaR_B1*30,VaR_B1*180,VaR_B1*360)
   rownames(VaR_B)<-c("1 dia","30 dias","180 dias", "360 dias")
 
-  kable(VaR_B,digits=4,caption = "Método de Simulación Bootstrapping- Portafolio")
+  kable(VaR_B,digits=4,caption = "Método de Simulación Bootstrapping- VaR Diversificado")
   
 
 # //////////////////////////////////////////////////////////////////////////////////  
